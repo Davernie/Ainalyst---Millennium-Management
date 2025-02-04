@@ -18,9 +18,35 @@ class astParser(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_If(self, node):
-        # Detect dead code (if False or if 0 conditions)
+        # Detect dead code (if condition is a constant False, 0, None, or empty string)
         if isinstance(node.test, ast.Constant) and not node.test.value:
             self.issues.append("Warning: Detected dead code in an 'if' statement with a constant False condition.")
+        # Support for older versions of Python
+        elif isinstance(node.test, (ast.Num, ast.Str, ast.NameConstant)) and not bool(
+                node.test.n if isinstance(node.test, ast.Num) else
+                node.test.s if isinstance(node.test, ast.Str) else
+                node.test.value
+        ):
+            self.issues.append(
+                "Warning: Detected dead code in an 'if' statement with a constant False-equivalent condition.")
+
+        # Continue visiting the rest of the AST (important for function bodies)
+        self.generic_visit(node)
+
+    def visit_While(self, node):
+        # Detect dead code (if condition is a constant False, 0, None, or empty string)
+        if isinstance(node.test, ast.Constant) and not node.test.value:
+            self.issues.append("Warning: Detected dead code in an 'if' statement with a constant False condition.")
+        # Support for older versions of Python
+        elif isinstance(node.test, (ast.Num, ast.Str, ast.NameConstant)) and not bool(
+                node.test.n if isinstance(node.test, ast.Num) else
+                node.test.s if isinstance(node.test, ast.Str) else
+                node.test.value
+        ):
+            self.issues.append(
+                "Warning: Detected dead code in a 'while' statement with a constant False-equivalent condition.")
+
+        # Continue visiting the rest of the AST (important for function bodies)
         self.generic_visit(node)
 
     def visit_Exec(self, node):
@@ -78,4 +104,3 @@ if __name__ == "__main__":
         analyze_code_from_file(sys.argv[1])
     else:
         analyze_code_from_input()
-
