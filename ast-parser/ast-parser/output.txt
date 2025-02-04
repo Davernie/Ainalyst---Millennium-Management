@@ -1,3 +1,5 @@
 
 Analysis Report:
 Warning: Function 'partition_string' takes arguments but has no return statement.
+Warning: Detected dead code in an 'if' statement with a constant False-equivalent condition.
+Warning: Detected dead code in a 'while' statement with a constant False-equivalent condition.
