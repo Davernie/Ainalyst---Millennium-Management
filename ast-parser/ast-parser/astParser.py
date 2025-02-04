@@ -36,7 +36,7 @@ class astParser(ast.NodeVisitor):
     def visit_While(self, node):
         # Detect dead code (if condition is a constant False, 0, None, or empty string)
         if isinstance(node.test, ast.Constant) and not node.test.value:
-            self.issues.append("Warning: Detected dead code in an 'if' statement with a constant False condition.")
+            self.issues.append("Warning: Detected dead code in a 'while' statement with a constant False condition.")
         # Support for older versions of Python
         elif isinstance(node.test, (ast.Num, ast.Str, ast.NameConstant)) and not bool(
                 node.test.n if isinstance(node.test, ast.Num) else
