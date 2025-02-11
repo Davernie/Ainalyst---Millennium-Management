@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from app.api.v1 import api_router
-from app.core.config import settings
 
-app = FastAPI(title=settings.PROJECT_NAME)
+from api.v1 import api_router
+from core.config import settings
 
-app.include_router(api_router, prefix=f"/api/{settings.API_VERSION}")
+app = FastAPI()
+
+app.include_router(api_router)
 
 if __name__ == "__main__":
     import uvicorn
