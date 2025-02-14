@@ -1,14 +1,9 @@
 pipeline {
     agent any
     stages {
-        stage('Code Analysis') {
+        stage('Hello') {
             steps {
-                script {
-                    def response = sh(script: """
-                        echo "Hello"
-                    """, returnStdout: true)
-                    echo "Analysis Results: ${response}"
-                }
+                echo 'Hello'
             }
         }
     }
