@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Read the code from a file in the repository
-                    def code = readFile('File_name')
+                    def code = readFile('Example.py')
 
                     // Send the code to the API
                     def response = sh(script: """
