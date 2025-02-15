@@ -1,4 +1,5 @@
 -- code to create the table in PostgreSQL
+CREATE DATABASE resultsdb;
 
 CREATE TABLE CodeAnalysis (
 username varchar(20),

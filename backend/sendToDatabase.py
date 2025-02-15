@@ -12,39 +12,13 @@ def sendData(userName, fileLocation):
         with open(fileLocation, "r") as file:
             fileToAnalyze = file.read()
 
-        payload = {"code": fileToAnalyze}
+        payload = {"code": fileToAnalyze,"userName":userName,"fileLocation":fileLocation}
 
         response = requests.post(url, json=payload)
         response_text = response.text
         response_code = response.status_code
 
-        try:
-            conn = psycopg2.connect(database="resultsdb",
-                                    host='localhost',
-                                    port=5432)
-            cursor = conn.cursor()
-            if response_code == 200:
-                cursor.execute(
-                    "INSERT INTO CodeAnalysis (username, date_and_time, filename, response_code, response, ai_response) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (userName, timestamp, fileLocation, response_code, response_text, "Not yet implemented")
-                )
-            elif response_code == 204:
-                cursor.execute(
-                    "INSERT INTO CodeAnalysis (username, date_and_time, filename, response_code, response, ai_response) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (userName, timestamp, fileLocation, response_code, "No issues detected", "Not yet implemented")
-                )
-            else:
-                cursor.execute(
-                    "INSERT INTO CodeAnalysis (username, date_and_time, filename, response_code, response, ai_response) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (userName, timestamp, fileLocation, response_code, "API error", "Not yet implemented")
-                )
-            conn.commit()
-            print("API response successfully stored in PostgreSQL!")
-        except Exception as e:
-            print("Database error:", e)
-        finally:
-            cursor.close()
-            conn.close()
+        print (response_code,response_text)
         return 1
     except Exception as e:
         print("Connection error:", e)
