@@ -34,20 +34,24 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
     #code_smells = check_code_smell(code)       #todo: Uncomment Once you have API KEY
 
     # Store the response in the database
-    db.execute(
+    result = db.execute(
         response_data.insert().values(
             timestamp=datetime.utcnow(),
             code=code,
             report_response=json.dumps({
                 "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                 "PEP8 Issues": pep8_issues,
-                "Code Smells": "None" #todo: Once we have API KEY, we can add code_smells
+                "Code Smells": "None"  # todo: Once we have API KEY, we can add code_smells
             })
-        )
+        ).returning(response_data.c.id)  # Return the id of the inserted row
     )
     db.commit()
 
+    # Extract the id from the result
+    inserted_id = result.fetchone()[0]  # Fetch the id from the result tuple
+
     return {
+        "Status": f"Successfully Added information in Database with id: {inserted_id}",
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues
         #"Code Smells": code_smells         #todo: Uncomment Once you have API KEY
