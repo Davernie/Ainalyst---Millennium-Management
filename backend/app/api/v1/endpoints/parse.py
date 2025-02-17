@@ -41,13 +41,13 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
             report_response=json.dumps({
                 "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                 "PEP8 Issues": pep8_issues,
-                "Code Smells": "None"  # todo: Once we have API KEY, we can add code_smells
+                "Code Smells": "Once I have API KEY, we can add code_smells"  # todo: Once I have API KEY, we can add code_smells
             })
-        ).returning(response_data.c.id)  # Return the id of the inserted row
+        ).returning(response_data.c.id)
     )
     db.commit()
 
-    # Extract the id from the result
+
     inserted_id = result.fetchone()[0]  # Fetch the id from the result tuple
 
     return {
@@ -67,8 +67,8 @@ async def get_all_responses(db: Session = Depends(get_db)):
         {
             "id": row.id,
             "timestamp": row.timestamp,
-            "code": row.code,  # Already stored as a string
-            "report_response": json.loads(row.report_response)  # Convert JSON string to dictionary
+            "code": row.code,
+            "report_response": json.loads(row.report_response)
         }
         for row in results
     ]
@@ -85,6 +85,6 @@ async def get_response_by_id(response_id: int, db: Session = Depends(get_db)):
     return {
         "id": result.id,
         "timestamp": result.timestamp,
-        "code": result.code,  # Already stored as a string
-        "report_response": json.loads(result.report_response)  # Convert JSON string to dictionary
+        "code": result.code,
+        "report_response": json.loads(result.report_response)
     }
