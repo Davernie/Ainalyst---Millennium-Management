@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Set Up Python Environment') {
+            steps {
+                sh """
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    # Install Ruff or Flake8 if needed
+                    pip install ruff flake8
+                """
+            }
+        }
+
+        stage('Run Lint (PEP8) Checks') {
+            steps {
+                sh """
+                    . venv/bin/activate
+                    python backend/services/linting_service.py \
+                        --file backend/app/v1/fileForTesting.py \
+                        --output pep8_report.json
+                """
+            }
+        }
+
+        stage('Run AST Parsing') {
+            steps {
+                sh """
+                    . venv/bin/activate
+                    python backend/services/ast_parsing_service.py \
+                        --file backend/app/v1/fileForTesting.py \
+                        --output ast_report.json
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '*.json', fingerprint: true
+        }
+    }
+}
