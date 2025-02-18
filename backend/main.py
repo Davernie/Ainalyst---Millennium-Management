@@ -88,3 +88,33 @@ async def analyze_code(data: CodeInput):
         conn.close()
 
     return JSONResponse(content=response_data, status_code=status_code)
+# GET request that would give out all submissions by the same user with the same filename
+class ProgramInput(BaseModel):
+    userName: str  # Username of the user submitting the code
+    fileLocation: str  # Location of the file being analyzed
+@app.get("/log/")
+async def get_log(data: CodeInput):
+    """Analyze Python code for AST issues and PEP8 violations."""
+    userName = data.userName
+    fileLocation = data.fileLocation
+
+
+    try:
+        conn = psycopg2.connect(database="resultsdb",
+                                host='localhost',
+                                port=5432)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT * FROM codeanalysis WHERE username = %s AND filename = %s;",
+            (userName, fileLocation)
+        )
+        conn.commit()
+        print("Daatabase request successful!")
+    except Exception as e:
+        print("Database error:", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+    return JSONResponse(content=response_data, status_code=status_code)
