@@ -7,7 +7,17 @@ from ast_parser.astParser import astParser
 from fastapi.responses import JSONResponse
 from datetime import datetime
 from pytz import utc
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Allow requests from your React app
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 class CodeInput(BaseModel):
     code: str  # User submits Python code as a string
@@ -88,33 +98,41 @@ async def analyze_code(data: CodeInput):
         conn.close()
 
     return JSONResponse(content=response_data, status_code=status_code)
-# GET request that would give out all submissions by the same user with the same filename
+# POST request that would give out all submissions by the same user with the same filename
 class ProgramInput(BaseModel):
     userName: str  # Username of the user submitting the code
     fileLocation: str  # Location of the file being analyzed
-@app.get("/log/")
-async def get_log(data: CodeInput):
-    """Analyze Python code for AST issues and PEP8 violations."""
+@app.post("/log/")
+async def get_log(data: ProgramInput):
+    """Fetch log entries for a specific user and file location."""
     userName = data.userName
     fileLocation = data.fileLocation
-
+    responseCode = 200
 
     try:
-        conn = psycopg2.connect(database="resultsdb",
-                                host='localhost',
-                                port=5432)
+        conn = psycopg2.connect(database="resultsdb", host='localhost', port=5432)
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT * FROM codeanalysis WHERE username = %s AND filename = %s;",
+            "SELECT date_and_time, response FROM codeanalysis WHERE username = %s AND filename = %s;",
             (userName, fileLocation)
         )
+        unformatted_response = cursor.fetchall()
+        print("Unformatted response from database:", unformatted_response)
+
         conn.commit()
-        print("Daatabase request successful!")
+        print("Database request successful!")
+        dbReply = [
+            {"date_and_time": str(row[0]), "response": row[1]} for row in unformatted_response
+        ]
+        print("Formatted response:", dbReply)
+
     except Exception as e:
         print("Database error:", e)
+        dbReply = ("Database error")
+        responseCode = 418
     finally:
         cursor.close()
         conn.close()
 
-    return JSONResponse(content=response_data, status_code=status_code)
+    return JSONResponse(content=dbReply, status_code=responseCode)

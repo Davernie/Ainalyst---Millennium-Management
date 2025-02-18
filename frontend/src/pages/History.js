@@ -5,10 +5,30 @@ function History() {
   const [filePath, setFilePath] = useState("");
   const [log, setLog] = useState(null);
 
-  const fetchLogs = () => {
+  const fetchLogs = async (e) => {
+    e.preventDefault();
     console.log("Fetching logs for:", username, filePath);
-    setLog(["Issue 1: Syntax error", "Issue 2: Deprecated function used"]); // Placeholder data
+    try {
+      const response = await fetch('http://127.0.0.1:8000/log/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: username, fileLocation: filePath }),
+      });
+  
+      if (response.status === 200) {
+        const data = await response.json();
+        setLog(data);  // Store the full JSON response
+        console.log(data);
+      } else {
+        setLog('Error: Unable to fetch logs');
+        console.error('Error: Unable to fetch logs', response.statusText);
+      }
+    } catch (error) {
+      console.error('Database error', error);
+      setLog('Error: Database error');
+    }
   };
+  
 
   return (
     <div>
@@ -21,12 +41,15 @@ function History() {
         <div>
           <h3>Previous Issues:</h3>
           <ul>
-            {log.map((issue, index) => (
-              <li key={index}>{issue}</li>
-            ))}
+            {Array.isArray(log) ? log.map((entry, index) => (
+              <li key={index}>
+                <strong>{entry.date_and_time}:</strong> {entry.response}
+              </li>
+            )) : <li>{log}</li>}
           </ul>
         </div>
       )}
+
     </div>
   );
 }
