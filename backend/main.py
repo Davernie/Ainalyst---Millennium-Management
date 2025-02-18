@@ -9,6 +9,7 @@ from datetime import datetime
 from pytz import utc
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+import json
 
 app.add_middleware(
     CORSMiddleware,
@@ -68,7 +69,7 @@ async def analyze_code(data: CodeInput):
         status_code = 500  # Internal Server Error
     else:
         status_code = 200  # OK, but with issues
-
+    response_json = json.dumps(response_data)
     try:
         conn = psycopg2.connect(database="resultsdb",
                                 host='localhost',
@@ -77,7 +78,7 @@ async def analyze_code(data: CodeInput):
         if status_code == 200:
             cursor.execute(
                 "INSERT INTO CodeAnalysis (username, date_and_time, filename, response_code, response, ai_response) VALUES (%s, %s, %s, %s, %s, %s)",
-                (userName, timestamp, fileLocation, status_code, response_data, "Not yet implemented")
+                (userName, timestamp, fileLocation, status_code, response_json, "Not yet implemented")
             )
         elif status_code == 204:
             cursor.execute(
