@@ -24,4 +24,4 @@ def sendData(userName, fileLocation):
         print("Connection error:", e)
         return 0
 
-sendData("alexrybak", "fileForTesting.py")
+sendData("alexrybak", "astParser.py")
