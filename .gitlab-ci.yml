@@ -1,6 +1,14 @@
 stages:
+  - cleanup
   - build
   - test
+
+cleanup-job:
+  stage: cleanup
+  script:
+    - echo "Cleaning up workspace..."
+    - rm -rf temp_files/ || true  
+    - echo "Cleanup complete."
 
 build-job:
   stage: build
