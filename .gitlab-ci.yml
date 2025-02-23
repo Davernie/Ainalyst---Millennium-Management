@@ -9,6 +9,7 @@ cleanup-job:
     - echo "Cleaning up workspace..."
     - rm -rf temp_files/ || true  
     - echo "Cleanup complete."
+  allow_failure: true
 
 build-job:
   stage: build

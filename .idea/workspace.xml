@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="67a2fc48-1d3c-41d7-9a8c-af9588baf3f7" name="Changes" comment="Created file that extracts jira description from a jira issue">
+    <list default="true" id="67a2fc48-1d3c-41d7-9a8c-af9588baf3f7" name="Changes" comment="updated build jobs for ci/cd">
       <change beforePath="$PROJECT_DIR$/.gitlab-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.gitlab-ci.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -86,12 +86,21 @@
       <option name="project" value="LOCAL" />
       <updated>1740198128987</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="updated build jobs for ci/cd">
+      <option name="closed" value="true" />
+      <created>1740328099750</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1740328099750</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Created file that extracts jira description from a jira issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="Created file that extracts jira description from a jira issue" />
+    <MESSAGE value="updated build jobs for ci/cd" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated build jobs for ci/cd" />
   </component>
 </project>
