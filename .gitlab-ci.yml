@@ -13,7 +13,11 @@ cleanup-job:
 build-job:
   stage: build
   script:
-    - echo "Building"
+    - echo "Installing dependencies..."
+    - python -m pip install --upgrade pip
+    - pip install -r backend/requirements.txt
+    - echo "Building the application..."
+    - echo "Build complete."
 
 test-job:
   stage: test
