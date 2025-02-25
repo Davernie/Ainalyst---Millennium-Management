@@ -6,10 +6,9 @@ stages:
 cleanup-job:
   stage: cleanup
   script:
-    - echo "Cleaning up workspace..."
-    - rm -rf temp_files/ || true  
-    - echo "Cleanup complete."
-  allow_failure: true
+    - echo "Running cleanup"
+    - docker system prune -af
+    - rm -rf /tmp/*
 
 build-job:
   stage: build
