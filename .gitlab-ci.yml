@@ -6,9 +6,9 @@ stages:
 cleanup-job:
   stage: cleanup
   script:
-    - echo "Running cleanup"
-    - docker system prune -af
-    - rm -rf /tmp/*
+    - echo "Running cleanup" 
+    - docker system prune -af || true
+    - rm -rf /tmp/* || true
 
 build-job:
   stage: build
