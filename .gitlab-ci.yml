@@ -1,10 +1,12 @@
-image: python:3.12
+image: python:3.12  # Use the Docker image you need
 
 stages:
   - run_scripts
 
 run_python_scripts:
   stage: run_scripts
+  tags:
+    - docker
   script:
     - echo "Python version check"
     - python --version
