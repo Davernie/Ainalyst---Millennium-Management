@@ -1,17 +1,7 @@
 stages:
-  - build
-  - test
+  - analyze
 
-build-job:
-  stage: build
+print-commit-message:
+  stage: analyze
   script:
-    - echo "Installing dependencies..."
-    - python -m pip install --upgrade pip
-    - pip install -r backend/requirements.txt
-    - echo "Building the application..."
-    - echo "Build complete."
-
-test-job:
-  stage: test
-  script:
-    - echo "Testing"
+    - echo "Commit Message:" + ${CI_COMMIT_MESSAGE}
