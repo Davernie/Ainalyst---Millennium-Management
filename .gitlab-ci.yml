@@ -24,7 +24,7 @@ commit_and_upload:
 
     #5 Archive results in a folder
     - echo "Archiving reports as artifacts"
-    # mkdir reports  # creates folder to store results
+     mkdir reports  # creates folder to store results
 
     # Code below moves resutls generated from step 3 and 4 to the folder we just created
     # Uncomment following 2 lines if it's correct and delete this line
