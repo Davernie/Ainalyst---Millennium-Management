@@ -1,18 +1,11 @@
-image: python:3.12
-
 stages:
-  - upload_and_archive
+  - setup
+  - run_scripts
 
-commit_and_upload:
-  stage: upload_and_archive
+install_python:
+  stage: setup
   script:
-    # 1. Print commit message
-    - echo "Commit Message:" ${CI_COMMIT_MESSAGE}
-
-    # 2. Install dependencies with caching
-    - echo "Installing dependencies"
-    - pip install --cache-dir .cache/pip -r backend/requirements.txt
-
-  cache:
-    paths:
-      - .cache/pip  # Cache pip packages for faster builds
+    - echo "Installing Python and pip"
+    - sudo apt-get update && sudo apt-get install -y python3 python3-pip
+    - python3 --version
+    - pip --version
