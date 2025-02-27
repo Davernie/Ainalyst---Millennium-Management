@@ -1,14 +1,11 @@
 stages:
-  - analyze
-  - upload
+  - analyze_and_upload
 
-print-commit-message:
-  stage: analyze
+commit_and_upload:
+  stage: analyze_and_upload
   script:
     - echo "Commit Message:" ${CI_COMMIT_MESSAGE}
-
-send-file-to-api:
-  stage: upload
-  script:
-    - echo "sending RAW FILE to api endpoint"
-   # - curl -X POST "https://api_endpoint" -H "Content-Type: application/octet-stream" --data-binary @example.py
+    - echo "Sending RAW FILE to API endpoint"
+    # Uncomment the next line to actually send the raw file, need to add in api address
+    # Can be changed to send as json if needed
+    # - curl -X POST "https://api_endpoint" -H "Content-Type: application/octet-stream" --data-binary @example.py
