@@ -8,8 +8,8 @@ commit_and_upload:
     - echo "Commit Message:" ${CI_COMMIT_MESSAGE}
 
     #2 Install Dependencies 
-    - apt-get update && apt-get install -y python3 python3-pip  
-    - pip install -r backend/requirements.txt 
+    # apt-get update && apt-get install -y python3 python3-pip  
+    # pip install -r backend/requirements.txt 
   
     #3 Run the PEP8 linter
     - echo "Running PEP8 linter"
