@@ -32,11 +32,9 @@ commit_and_upload:
     # mv location_of_ASTparsing_results.txt reports/
 
   # Below simply decides how long we keep the reports folder, also makes the file accessible for download
-  # Uncomment the following paragraph if all above is working
-  #artifacts:
-  #paths:
-  #  - reports/  # Keep the reports folder and its contents
-  #expire_in: 1 week 
+  artifacts:
+    paths:
+      - reports/  # Keep the reports folder and its contents
 
     ########
     #extras, not sure if needed
