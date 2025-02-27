@@ -1,11 +1,11 @@
+image: python:3.12
+
 stages:
-  - setup
   - run_scripts
 
-install_python:
-  stage: setup
+run_python_scripts:
+  stage: run_scripts
   script:
-    - echo "Installing Python and pip"
-    - sudo apt-get update && sudo apt-get install -y python3 python3-pip
-    - python3 --version
+    - echo "Python version check"
+    - python --version
     - pip --version
