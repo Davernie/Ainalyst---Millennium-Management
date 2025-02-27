@@ -1,13 +1,6 @@
 stages:
-  - cleanup
   - build
   - test
-
-cleanup-job:
-  stage: cleanup
-  script:
-    - echo "Running cleanup" 
-    - rm -rf /tmp/* 
 
 build-job:
   stage: build
@@ -17,10 +10,6 @@ build-job:
     - pip install -r backend/requirements.txt
     - echo "Building the application..."
     - echo "Build complete."
-  artifacts:
-    paths:
-      - build/
-    expire_in: 1hr
 
 test-job:
   stage: test
