@@ -1,11 +1,46 @@
 stages:
-  - analyze_and_upload
+  - upload_and_archive
 
 commit_and_upload:
-  stage: analyze_and_upload
+  stage: upload_and_archive
   script:
+    #1 Check code and print commit messages
     - echo "Commit Message:" ${CI_COMMIT_MESSAGE}
-    - echo "Sending RAW FILE to API endpoint"
+
+    #2 Install Dependencies 
+    - pip install -r backend/requirements.txt 
+  
+    #3 Run the PEP8 linter
+    - echo "Running PEP8 linter"
+    # Uncomment the one we will use
+    # ruff check .  
+    # - flake8 .  
+
+    #4 Run the AST parsing script
+    - echo "Running AST parsing script"
+    # Uncomment if next line is the correct script
+    # python3 backend/astParser.py
+
+    #5 Archive results in a folder
+    - echo "Archiving reports as artifacts"
+    # mkdir reports  # creates folder to store results
+
+    # Code below moves resutls generated from step 3 and 4 to the folder we just created
+    # Uncomment following 2 lines if it's correct and delete this line
+    # mv location_of_linting_results.txt reports/
+    # mv location_of_ASTparsing_results.txt reports/
+
+  # Below simply decides how long we keep the reports folder, also makes the file accessible for download
+  # Uncomment the following paragraph if all above is working
+  #artifacts:
+  #paths:
+  #  - reports/  # Keep the reports folder and its contents
+  #expire_in: 1 week 
+
+    ########
+    #extras, not sure if needed
+    # echo "Sending RAW FILE to API endpoint"
     # Uncomment the next line to actually send the raw file, need to add in api address
     # Can be changed to send as json if needed
     # - curl -X POST "https://api_endpoint" -H "Content-Type: application/octet-stream" --data-binary @example.py
+    ########
