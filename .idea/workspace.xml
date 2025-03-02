@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="67a2fc48-1d3c-41d7-9a8c-af9588baf3f7" name="Changes" comment="forced build-job to run regardless of cleanup-job failure">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/Jira/Jira.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/Jira/Jira.py" afterDir="false" />
-    </list>
+    <list default="true" id="67a2fc48-1d3c-41d7-9a8c-af9588baf3f7" name="Changes" comment="updated build jobs for ci/cd" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,183 +39,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.Jira.executor": "Run",
-    "Python.Unnamed.executor": "Run",
-    "Python.codesmells.executor": "Run",
-    "Python.convert_to_json.executor": "Run",
-    "Python.gitdiffs.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.sendToDatabase.executor": "Run",
-    "Python.snippet.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/College/Sofware Engineering II/Main/sweng25_group01_ainalyst",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.Jira.executor&quot;: &quot;Run&quot;,
+    &quot;Python.convert_to_json.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.sendToDatabase.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/College/Sofware Engineering II/Main/sweng25_group01_ainalyst&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/backend" />
     </key>
-  </component>
-  <component name="RunManager" selected="Python.Jira">
-    <configuration name="Jira" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="sweng25_group01_ainalyst" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend/app/Jira" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/app/Jira/Jira.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="sweng25_group01_ainalyst" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="OPENAI_API_KEY" value="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" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="codesmells" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="sweng25_group01_ainalyst" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="OPENAI_API_KEY" value="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" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend/AI" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/AI/codesmells.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="gitdiffs" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="sweng25_group01_ainalyst" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="OPENAI_API_KEY" value="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" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend/AI" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/AI/gitdiffs.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="jira_generator" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="sweng25_group01_ainalyst" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="OPENAI_API_KEY" value="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" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend/AI" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/AI/jira_generator.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="snippet" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="sweng25_group01_ainalyst" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="OPENAI_API_KEY" value="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" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend/AI" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/AI/snippet.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="Python.codesmells" />
-      <item itemvalue="Python.gitdiffs" />
-      <item itemvalue="Python.jira_generator" />
-      <item itemvalue="Python.snippet" />
-      <item itemvalue="Python.Unnamed" />
-      <item itemvalue="Python.Jira" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.Jira" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -253,22 +92,13 @@
       <option name="project" value="LOCAL" />
       <updated>1740328099750</updated>
     </task>
-    <task id="LOCAL-00003" summary="forced build-job to run regardless of cleanup-job failure">
-      <option name="closed" value="true" />
-      <created>1740328261585</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1740328261585</updated>
-    </task>
-    <option name="localTasksCounter" value="4" />
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Created file that extracts jira description from a jira issue" />
     <MESSAGE value="updated build jobs for ci/cd" />
-    <MESSAGE value="forced build-job to run regardless of cleanup-job failure" />
-    <option name="LAST_COMMIT_MESSAGE" value="forced build-job to run regardless of cleanup-job failure" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated build jobs for ci/cd" />
   </component>
 </project>

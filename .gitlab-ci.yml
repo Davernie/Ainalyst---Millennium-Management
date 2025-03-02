@@ -1,29 +1,21 @@
+image: python:3.12
+
 stages:
-  - cleanup
-  - build
-  - test
+  - run_scripts
+  - test_scripts
 
-cleanup-job:
-  stage: cleanup
+run_python_scripts:
+  stage: run_scripts
+  tags:
+    - docker
   script:
-    - echo "Running cleanup" 
-    - docker system prune -f 
-    - rm -rf /tmp/* 
+    - echo "Python version check"
+    - python --version
+    - pip --version
 
-build-job:
-  stage: build
+test_python_scripts:
+  stage: test_scripts
+  tags:
+    - docker
   script:
-    - echo "Installing dependencies..."
-    - python -m pip install --upgrade pip
-    - pip install -r backend/requirements.txt
-    - echo "Building the application..."
-    - echo "Build complete."
-  artifacts:
-    paths:
-      - build/
-    expire_in: 1hr
-
-test-job:
-  stage: test
-  script:
-    - echo "Testing"
+    - python -c "print('Hello World')"
