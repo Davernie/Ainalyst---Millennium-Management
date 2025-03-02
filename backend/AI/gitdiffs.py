@@ -1,10 +1,16 @@
 import os
 import litellm
+from dotenv import load_dotenv
+from backend.app.Jira.Jira import get_jira_description
+
+load_dotenv()
 
 # Load API key from environment variable for security (Message me your tcd email so I can add you to the project on OpenAI's site)
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("API key not found. Set OPENAI_API_KEY environment variable.")
+
+jira_description = get_jira_description()
 
 # Reads the Git diff from a file
 def analyze_git_diff(file_path="git_diff_output.txt"):
@@ -18,7 +24,7 @@ def analyze_git_diff(file_path="git_diff_output.txt"):
                 model="gpt-4o-mini",  # Replace with actual model ID as needed
                 messages=[
                     {"role": "system", "content": "You analyze Git diffs for common code smells and suggest improvements."},
-                    {"role": "user", "content": f"Analyze the following Git diff and suggest improvements:\n\n{git_diff_content}"}
+                    {"role": "user", "content": f"Analyze the following Git diff and suggest improvements:\n\n{git_diff_content}\n\nAlso, analyze the following JIRA issue description to see if the code addresses all the issues and features mentioned:\n\n{jira_description}"}
                 ],
                 temperature=0.0,
                 max_tokens=1500,
