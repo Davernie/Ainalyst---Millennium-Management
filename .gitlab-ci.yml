@@ -3,7 +3,6 @@ image: python:3.12
 stages:
   - run_scripts
   - test_scripts
-  - pep8_linter
 
 run_python_scripts:
   stage: run_scripts
@@ -14,6 +13,14 @@ run_python_scripts:
     - python --version
     - pip --version
     - pip install --upgrade pip 
+    - echo "Running pep8"
+    - pip install ruff flake8   
+    - ruff check backend/ast_parser/fileForTesting >  ruff_report.txt 
+  artifacts:
+    paths:
+      - ruff_report.txt
+    expire_in: 1 day
+
 
 test_python_scripts:
   stage: test_scripts
@@ -21,16 +28,4 @@ test_python_scripts:
     - docker
   script:
     - python -c "print('Hello World')"
-
-run_pep8_linter:
-  stage: pep8_linter
-  script:
-    - echo "Running pep8"
-    - pip install --upgrade pip 
-    - pip install ruff flake8   
-    - ruff check backend/ast_parser/fileForTesting >  ruff_report.txt 
-  artifacts:
-    paths:
-      - ruff_report.txt
-    expire_in: 1 day
 
