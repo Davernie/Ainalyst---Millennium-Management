@@ -14,7 +14,6 @@ run_python_scripts:
     - python --version
     - pip --version
     - pip install --upgrade pip 
-    - pip install ruff flake8   
 
 test_python_scripts:
   stage: test_scripts
@@ -27,6 +26,8 @@ run_pep8_linter:
   stage: pep8_linter
   script:
     - echo "Running pep8"
+    - pip install --upgrade pip 
+    - pip install ruff flake8   
     - ruff check backend/ast_parser/fileForTesting >  ruff_report.txt 
   artifacts:
     paths:
