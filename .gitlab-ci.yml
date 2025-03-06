@@ -12,6 +12,7 @@ run_python_scripts:
     - echo "Python version check"
     - python --version
     - pip --version
+    - pip install -r backend/requirements.txt
 
 test_python_scripts:
   stage: test_scripts
