@@ -1,25 +1,55 @@
 image: python:3.12
 
 stages:
-  - run_scripts
+  - setting_up
+  - pep8_linter
+  - ast_parser
   - test_scripts
 
-run_python_scripts:
-  stage: run_scripts
+setup:
+  stage: setting_up
   tags:
     - docker
   script:
-    - echo "Python version check"
     - python --version
     - pip --version
-    - pip install --upgrade pip 
-    - echo "Running pep8"
-    - pip install ruff flake8   
-    - ruff check backend/ast_parser/fileForTesting.py > ruff_report.txt || true
+    - python -m venv venv  # Create a virtual environment 
+    - source venv/bin/activate # So requirements can be used across diff jobs
+    - pip install --upgrade pip ruff flake8  # Install requirements
+  cache:
+    key: requirements    #cache/store dependencies
+    paths:
+      - venv/
+  artifacts:
+    paths:
+      - venv/
+    expire_in: 1 week
+
+lint_code:
+  stage: pep8_linter
+  tags:
+    - docker
+  script:
+    - source venv/bin/activate  # 'retrieve' the dependencies
+    - echo "Running PEP8 checks"
+    - ruff check backend/ast_parser/fileForTesting.py > ruff_report.txt || true  #Proceed regardless
   artifacts:
     paths:
       - ruff_report.txt
-    expire_in: 1 day
+    expire_in: 1 week
+
+ast_parsing:
+  stage: ast_parser
+  tags:
+    - docker
+  script:
+    - source venv/bin/activate
+    - echo "Running AST Parser"
+    - python backend/ast_parser/ast_parser.py > ast_output.txt
+  artifacts:
+    paths:
+      - ast_output.txt
+    expire_in: 1 week
 
 
 test_python_scripts:
@@ -27,5 +57,6 @@ test_python_scripts:
   tags:
     - docker
   script:
+    - source venv/bin/activate
     - python -c "print('Hello World')"
 
