@@ -45,7 +45,7 @@ ast_parsing:
   script:
     - source venv/bin/activate
     - echo "Running AST Parser"
-    - python backend/ast_parser/ast_parser.py > ast_output.txt
+    - python backend/ast_parser/astParser.py > ast_output.txt
   artifacts:
     paths:
       - ast_output.txt
