@@ -57,6 +57,7 @@ run_python_script:
     - docker
   script:
     - source venv/bin/activate
+    - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
     - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > scripts_output.txt
   artifacts:
