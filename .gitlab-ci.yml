@@ -2,9 +2,7 @@ image: python:3.12
 
 stages:
   - setting_up
-  - pep8_linter
-  - ast_parser
-  - test_scripts
+  - analyse_code
 
 setup:
   stage: setting_up
@@ -25,34 +23,9 @@ setup:
       - venv/
     expire_in: 1 week
 
-lint_code:
-  stage: pep8_linter
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate  # 'retrieve' the dependencies
-    - echo "Running PEP8 checks"
-    - ruff check backend/ast_parser/fileForTesting.py > ruff_report.txt || true  #Proceed regardless
-  artifacts:
-    paths:
-      - ruff_report.txt
-    expire_in: 1 week
 
-ast_parsing:
-  stage: ast_parser
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate
-    - echo "Running AST Parser"
-    - python backend/ast_parser/astParser.py > ast_output.txt || true #Force true
-  artifacts:
-    paths:
-      - ast_output.txt
-    expire_in: 1 week
-
-run_python_script:
-  stage: test_scripts
+analyse:
+  stage: analyse_code
   tags:
     - docker
   script:
