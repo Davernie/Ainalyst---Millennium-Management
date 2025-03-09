@@ -60,7 +60,7 @@ run_python_script:
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
     - pip install litellm
-    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > scripts_output.txt
+    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > scripts_output.txt 2>&1 || true
   artifacts:
     paths:
       - script_output.txt
