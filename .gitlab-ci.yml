@@ -51,12 +51,17 @@ ast_parsing:
       - ast_output.txt
     expire_in: 1 week
 
-
-test_python_scripts:
+run_python_script:
   stage: test_scripts
   tags:
     - docker
   script:
     - source venv/bin/activate
-    - python -c "print('Hello World')"
+    - echo "Running custom Python script"
+    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > scripts_output.txt
+  artifacts:
+    paths:
+      - script_output.txt
+    expire_in: 1 week
+
 

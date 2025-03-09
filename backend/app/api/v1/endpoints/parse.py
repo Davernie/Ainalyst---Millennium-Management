@@ -31,7 +31,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
     # Run PEP8 compliance check
     pep8_issues = run_pep8_linter(code)
 
-    #code_smells = check_code_smell(code)       #todo: Uncomment Once you have API KEY
+    code_smells = check_code_smell(code)       #todo: Uncomment Once you have API KEY
 
     # Store the response in the database
     result = db.execute(
@@ -41,7 +41,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
             report_response=json.dumps({
                 "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                 "PEP8 Issues": pep8_issues,
-                "Code Smells": "Once I have API KEY, we can add code_smells"  # todo: Once I have API KEY, we can add code_smells
+                "Code Smells": code_smells  # todo: Once I have API KEY, we can add code_smells
             })
         ).returning(response_data.c.id)
     )
@@ -54,7 +54,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
         "Status": f"Successfully Added information in Database with id: {inserted_id}",
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues
-        #"Code Smells": code_smells         #todo: Uncomment Once you have API KEY
+        "Code Smells": code_smells         #todo: Uncomment Once you have API KEY
     }
 
 
