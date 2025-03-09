@@ -63,7 +63,7 @@ run_python_script:
     - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > scripts_output.txt 2>&1 || true
   artifacts:
     paths:
-      - script_output.txt
+      - scripts_output.txt
     expire_in: 1 week
 
 
