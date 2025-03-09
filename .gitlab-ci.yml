@@ -59,6 +59,7 @@ run_python_script:
     - source venv/bin/activate
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
+    - pip install litellm
     - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > scripts_output.txt
   artifacts:
     paths:
