@@ -1,8 +1,8 @@
 import argparse
 
-from backend.app.services.ast_parsing_service import astParser
-from backend.app.services.code_smells_service import check_code_smell
-from backend.app.services.liniting_service import run_pep8_linter
+from services.ast_parsing_service import astParser
+from services.code_smells_service import check_code_smell
+from services.liniting_service import run_pep8_linter
 
 
 def analyze_code(code):
