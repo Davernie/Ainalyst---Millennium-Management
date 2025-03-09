@@ -43,7 +43,30 @@ def analyze_code(code):
     }
 
 
+def format_analysis_results(results):
+    """Format and print the analysis results in a structured, readable way."""
 
+    print("# Code Analysis Report\n")
+
+    # Print Status
+    print(f"## Status\n{results['Status']}\n")
+
+    # Print AST Issues
+    print("## AST Issues")
+    if isinstance(results['AST Issues'], list) and results['AST Issues']:
+        for issue in results['AST Issues']:
+            print(f"- {issue}")
+    else:
+        print("- No AST issues found.")
+    print("")
+
+    # Print PEP8 Issues
+    print("## PEP8 Compliance\n")
+    print(results['PEP8 Issues'].strip() if results['PEP8 Issues'] else "All checks passed!\n")
+
+    # Print Code Smells
+    print("## Code Smells\n")
+    print(results['Code Smells'].strip() if results['Code Smells'] else "No code smells detected.\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to run Linter, Parser & Code Smell Checker")
@@ -54,7 +77,7 @@ if __name__ == "__main__":
         with open(args.filePath, "r") as file:
             code = file.read()
             result = analyze_code(code)
-            print(result)
+            format_analysis_results(result)
 
     except FileNotFoundError:
         print("Error: File not found.")
