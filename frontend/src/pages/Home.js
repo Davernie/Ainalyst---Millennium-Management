@@ -17,7 +17,7 @@ function Home() {
   };
 
   return (
-    <div className="container">
+    <div className="page-container">
       <h2>Upload a File for Analysis</h2>
       <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />

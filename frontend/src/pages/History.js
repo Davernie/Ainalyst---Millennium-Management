@@ -31,12 +31,13 @@ function History() {
   
 
   return (
-    <div>
+    <div className="page-container">
       <h2>View Issue Log</h2>
+      <form>
       <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
       <input type="text" placeholder="File Path" value={filePath} onChange={(e) => setFilePath(e.target.value)} />
       <button onClick={fetchLogs}>Fetch Logs</button>
-
+      </form>
       {log && (
         <div>
           <h3>Previous Issues:</h3>

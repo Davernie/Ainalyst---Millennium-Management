@@ -1,0 +1,25 @@
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   viewBox="0 0 841.9 595.3"> 
+  <g fill="#61DAFB"> 
+    
+    <!-- AI Text -->
+    <text
+       x="100"
+       y="300"
+       font-size="100"
+       font-weight="bold"
+       font-family="Arial"
+       fill="#fcfcfc">AI</text>
+
+    <!-- Nalyst Text -->
+    <text
+       x="200"
+       y="300"
+       font-size="100"
+       font-weight="bold"
+       font-family="Arial"
+       fill="#00d4ff">Nalyst</text>
+
+  </g>
+</svg>
