@@ -55,7 +55,7 @@ function History() {
   };
 
   return (
-    <div>
+    <div className="page-container">
       <h2>View Issue Log</h2>
       <form onSubmit={fetchLogs}>
         <input

@@ -59,7 +59,7 @@ function Home() {
 
 
   return (
-    <div>
+    <div className="page-container">
       <h2>Analyze Python Code</h2>
       <input
         type="text"
