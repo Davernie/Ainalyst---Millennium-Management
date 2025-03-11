@@ -53,7 +53,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
     return {
         "Status": f"Successfully Added information in Database with id: {inserted_id}",
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
-        "PEP8 Issues": pep8_issues
+        "PEP8 Issues": pep8_issues,
         "Code Smells": code_smells         #todo: Uncomment Once you have API KEY
     }
 
