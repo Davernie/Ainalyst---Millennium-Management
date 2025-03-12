@@ -5,8 +5,11 @@ HOW TO RUN THE PROJECT
 git pull
 
 2. Install all the requirements. In terminal, from the directory where the project is cloned to, run:
+
    pip install -r backend/requirements.txt
+
    pip install -r backend/temporary_file.txt
+
    pip install -r frontend/requirements.txt
 
 3. Run the backend. In your IDE open backend/app/main.py, and run it.
