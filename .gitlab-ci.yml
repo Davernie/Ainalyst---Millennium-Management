@@ -2,9 +2,7 @@ image: python:3.12
 
 stages:
   - setting_up
-  - pep8_linter
-  - ast_parser
-  - test_scripts
+  - analyse_code
 
 setup:
   stage: setting_up
@@ -25,45 +23,20 @@ setup:
       - venv/
     expire_in: 1 week
 
-lint_code:
-  stage: pep8_linter
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate  # 'retrieve' the dependencies
-    - echo "Running PEP8 checks"
-    - ruff check backend/ast_parser/fileForTesting.py > ruff_report.txt || true  #Proceed regardless
-  artifacts:
-    paths:
-      - ruff_report.txt
-    expire_in: 1 week
 
-ast_parsing:
-  stage: ast_parser
+analyse:
+  stage: analyse_code
   tags:
     - docker
   script:
     - source venv/bin/activate
-    - echo "Running AST Parser"
-    - python backend/ast_parser/astParser.py > ast_output.txt || true #Force true
+    - export PYTHONPATH=$(pwd)
+    - echo "Running custom Python script"
+    - pip install litellm
+    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
   artifacts:
     paths:
-      - ast_output.txt
+      - report.md
     expire_in: 1 week
 
 
-test_python_scripts:
-  stage: test_scripts
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate
-    - python -c "print('Hello World')"
-
-test_openai_env:
-  stage: setting_up  # Assign to the correct stage
-  tags:
-    - docker
-  script:
-    - echo "Checking OpenAI API Key in GitLab CI/CD..."
-    - echo "OPENAI_API_KEY=${OPENAI_API_KEY:0:5}*****"
