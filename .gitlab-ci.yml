@@ -61,6 +61,9 @@ test_python_scripts:
     - python -c "print('Hello World')"
 
 test_openai_env:
+  stage: setting_up  # Assign to the correct stage
+  tags:
+    - docker
   script:
     - echo "Checking OpenAI API Key in GitLab CI/CD..."
     - echo "OPENAI_API_KEY=${OPENAI_API_KEY:0:5}*****"
