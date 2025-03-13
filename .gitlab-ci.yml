@@ -67,3 +67,4 @@ test_openai_env:
   script:
     - echo "Checking OpenAI API Key in GitLab CI/CD..."
     - echo "OPENAI_API_KEY=${OPENAI_API_KEY:0:5}*****"
+    - export OPENAI_API_KEY=$OPENAI_API_KEY # Set the API Key
