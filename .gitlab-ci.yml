@@ -60,3 +60,7 @@ test_python_scripts:
     - source venv/bin/activate
     - python -c "print('Hello World')"
 
+test_openai_env:
+  script:
+    - echo "Checking OpenAI API Key in GitLab CI/CD..."
+    - echo "OPENAI_API_KEY=${OPENAI_API_KEY:0:5}*****"
