@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from database.database import response_data
 
+from backend.app.scripts.run_scripts import format_analysis_results
 from backend.app.services.code_smells_service import check_code_smell
 
 router = APIRouter()
@@ -38,7 +39,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
     ast_issues = ast_parser.analyze(code)
     # Run PEP8 compliance check
     pep8_issues = run_pep8_linter(code)
-    code_smells = check_code_smell(code)       #todo: Uncomment Once you have API KEY
+    code_smells = check_code_smell(code)
     # Store the response in the database
     result = db.execute(
         response_data.insert().values(
@@ -47,7 +48,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
             report_response=json.dumps({
                 "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                 "PEP8 Issues": pep8_issues,
-                "Code Smells": code_smells  # todo: Once I have API KEY, we can add code_smells
+                "Code Smells": code_smells
             })
         ).returning(response_data.c.id)
     )
@@ -82,20 +83,27 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
         return {"error": f"Database insertion failed: {e}"}
     results = db.execute(select(response_data)).fetchall()
     print(f"Database contents after insert: {results}")  # Debugging log
-    return {
+
+    print()
+    print()
+    print()
+
+    response = {
         "Status": f"Successfully Added information in Database with id: {inserted_id}",
         "id": inserted_id,  # Add the id explicitly here
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues,
         "Code Smells": code_smells         #todo: Uncomment Once you have API KEY
     }
+    format_analysis_results(response)
+    return response
 
 
 @router.get("/responses", status_code=200)
 async def get_all_responses(db: Session = Depends(get_db)):
     """Retrieve all saved responses from the database."""
     results = db.execute(select(response_data)).fetchall()
-    if results.size > 1:
+    if results:
         return [
             {
                 "id": row.id,
@@ -114,6 +122,8 @@ async def get_all_responses(db: Session = Depends(get_db)):
                 "report_response": "N/A"
             }
         ]
+
+
 @router.post("/responses/{response_id}", status_code=200)
 async def get_response_by_id(response_id: int, db: Session = Depends(get_db)):
     """Retrieve a specific response by ID."""
