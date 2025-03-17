@@ -1,9 +1,25 @@
 image: python:3.12
 
 stages:
+  - cleanup
   - setting_up
   - analyse_code
   - run_api
+
+
+cleanup:
+  stage: cleanup
+  tags:
+    - docker
+  script:
+    - echo "Cleaning up unused Docker images, containers, and volumes"
+    - docker system prune -af  # Remove unused containers, images, volumes, and networks
+    - docker volume prune -f  # Clean up unused volumes
+    - echo "Cleaning up pip cache"
+    - pip cache purge  # Clear pip's cache
+    - echo "Removing temporary files and logs"
+    - rm -rf /tmp/*
+
 
 setup:
   stage: setting_up
@@ -23,6 +39,7 @@ setup:
     paths:
       - venv/
     expire_in: 1 week
+
 
 run_api:
   stage: run_api
@@ -58,5 +75,4 @@ analyse:
     paths:
       - report.md
     expire_in: 1 week
-
 
