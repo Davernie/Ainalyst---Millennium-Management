@@ -1,25 +1,42 @@
 image: python:3.12
 
-
 stages:
   - setting_up
   - run_api
+
+variables:
+  DB_USER: postgres
+  DB_PASSWORD: 6868
+  DB_HOST: localhost
+  DB_PORT: 5432
+  DB_NAME: postgre
 
 setup:
   stage: setting_up
   tags:
     - docker
+  services:
+    - name: postgres:15
+      alias: postgres
+      command: ["postgres", "-c", "log_statement=all"]
+  variables:
+    POSTGRES_USER: $DB_USER
+    POSTGRES_PASSWORD: $DB_PASSWORD
+    POSTGRES_DB: $DB_NAME
   script:
     - python --version
     - pip --version
     - pip cache purge  # Clear pip's cache
     - rm -rf /tmp/*  # Remove temporary files
     - rm -rf /var/tmp/*  # Clean up additional temporary directories
-    - python -m venv venv  # Create a virtual environment 
+    - python -m venv venv  # Create a virtual environment
     - source venv/bin/activate # So requirements can be used across diff jobs
     - pip install --upgrade pip ruff flake8  # Install requirements
+    - echo "Waiting for PostgreSQL to be ready..."
+    - sleep 10
+    - PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c "SELECT 'Database is ready!'"
   cache:
-    key: requirements    #cache/store dependencies
+    key: requirements  # Cache/store dependencies
     paths:
       - venv/
   artifacts:
@@ -27,14 +44,24 @@ setup:
       - venv/
     expire_in: 1 week
 
-
 run_api:
   stage: run_api
   tags:
     - docker
+  services:
+    - name: postgres:15
+      alias: postgres
+  variables:
+    POSTGRES_USER: $DB_USER
+    POSTGRES_PASSWORD: $DB_PASSWORD
+    POSTGRES_DB: $DB_NAME
   script:
     - source venv/bin/activate
     - pip install -r backend/requirements.txt
+    - echo "Waiting for PostgreSQL to be ready..."
+    - sleep 10  # Ensuring PostgreSQL is fully started
+    - echo "Running migrations (if applicable)..."
+    - alembic upgrade head || echo "No migrations found, skipping"
     - echo "Starting API with uvicorn"
     - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
     - sleep 5
@@ -46,5 +73,3 @@ run_api:
     paths:
       - response.json
     expire_in: 1 week
-
-
