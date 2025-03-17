@@ -33,7 +33,7 @@ run_api:
     - pip install uvicorn requests
     - echo "Starting API with uvicorn"
     - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
-    - sleep 5  # Wait for the server to start
+    - sleep 5 
     - echo "Sending request to the API"
     - curl -X GET http://127.0.0.1:8000/analyze -o response.json  # Send a request to the running API
     - cat response.json
