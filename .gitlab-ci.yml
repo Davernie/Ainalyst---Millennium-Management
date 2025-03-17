@@ -14,6 +14,8 @@ setup:
     - python --version
     - pip --version
     - pip cache purge  # Clear pip's cache
+    - rm -rf /tmp/*  # Remove temporary files
+    - rm -rf /var/tmp/*  # Clean up additional temporary directories
     - python -m venv venv  # Create a virtual environment 
     - source venv/bin/activate # So requirements can be used across diff jobs
     - pip install --upgrade pip ruff flake8  # Install requirements
