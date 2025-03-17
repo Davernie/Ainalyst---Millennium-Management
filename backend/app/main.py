@@ -7,6 +7,7 @@ from api.v1 import api_router
 from database.database import init_db,get_db
 
 from fastapi.middleware.cors import CORSMiddleware
+from api.v1.endpoints import update_env
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +21,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 app.include_router(api_router)
-
+app.include_router(update_env.router, prefix="/api/v1")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000","http://localhost",],
