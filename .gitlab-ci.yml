@@ -1,21 +1,66 @@
 image: python:3.12
 
-stages:
-  - run_scripts
-  - test_scripts
 
-run_python_scripts:
-  stage: run_scripts
+stages:
+  - setting_up
+  - analyse_code
+  - run_api
+
+setup:
+  stage: setting_up
   tags:
     - docker
   script:
-    - echo "Python version check"
     - python --version
     - pip --version
+    - pip cache purge  # Clear pip's cache
+    - rm -rf /tmp/*  # Remove temporary files
+    - rm -rf /var/tmp/*  # Clean up additional temporary directories
+    - python -m venv venv  # Create a virtual environment 
+    - source venv/bin/activate # So requirements can be used across diff jobs
+    - pip install --upgrade pip ruff flake8  # Install requirements
+  cache:
+    key: requirements    #cache/store dependencies
+    paths:
+      - venv/
+  artifacts:
+    paths:
+      - venv/
+    expire_in: 1 week
 
-test_python_scripts:
-  stage: test_scripts
+
+run_api:
+  stage: run_api
   tags:
     - docker
   script:
-    - python -c "print('Hello World')"
+    - source venv/bin/activate
+    - pip install uvicorn requests
+    - echo "Starting API with uvicorn"
+    - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
+    - sleep 5
+    - echo "Sending request to the API"
+    - curl -X GET http://127.0.0.1:8000/analyze -o response.json  # Send a request to the running API
+    - cat response.json
+
+  artifacts:
+    paths:
+      - response.json
+    expire_in: 1 week
+
+
+analyse:
+  stage: analyse_code
+  tags:
+    - docker
+  script:
+    - source venv/bin/activate
+    - export PYTHONPATH=$(pwd)
+    - echo "Running custom Python script"
+    - pip install litellm
+    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
+  artifacts:
+    paths:
+      - report.md
+    expire_in: 1 week
+
