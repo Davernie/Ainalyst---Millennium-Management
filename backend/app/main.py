@@ -1,13 +1,13 @@
-# main.py
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from api.v1 import api_router
+from backend.app.api.v1 import api_router
 from database.database import init_db,get_db
 
 from fastapi.middleware.cors import CORSMiddleware
-from api.v1.endpoints import update_env
+from backend.app.api.v1.endpoints import update_env
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
