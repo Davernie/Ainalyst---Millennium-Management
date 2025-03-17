@@ -34,7 +34,7 @@ run_api:
     - docker
   script:
     - source venv/bin/activate
-    - pip install fastapi sqlalchemy uvicorn requests
+    - pip install -r requirements.txt
     - echo "Starting API with uvicorn"
     - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
     - sleep 5
