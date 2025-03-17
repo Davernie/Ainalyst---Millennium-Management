@@ -1,27 +1,8 @@
 image: python:3.12
 
-services:
-  - docker:20.10.7-dind
-
 stages:
-  - cleanup
   - setting_up
   - analyse_code
-  - run_api
-
-
-cleanup:
-  stage: cleanup
-  tags:
-    - docker
-  script:
-    - echo "Cleaning up unused Docker images, containers, and volumes"
-    - docker system prune -af  # Remove unused containers, images, volumes, and networks
-    - docker volume prune -f  # Clean up unused volumes
-    - echo "Cleaning up pip cache"
-    - pip cache purge  # Clear pip's cache
-    - echo "Removing temporary files and logs"
-    - rm -rf /tmp/*
 
 
 setup:
@@ -41,26 +22,6 @@ setup:
   artifacts:
     paths:
       - venv/
-    expire_in: 1 week
-
-
-run_api:
-  stage: run_api
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate
-    - pip install uvicorn requests
-    - echo "Starting API with uvicorn"
-    - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
-    - sleep 5 
-    - echo "Sending request to the API"
-    - curl -X GET http://127.0.0.1:8000/analyze -o response.json  # Send a request to the running API
-    - cat response.json
-
-  artifacts:
-    paths:
-      - response.json
     expire_in: 1 week
 
 
