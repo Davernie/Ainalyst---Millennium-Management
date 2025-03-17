@@ -7,13 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 
-from services.ast_parsing_service import astParser
-from services.liniting_service import run_pep8_linter
+from backend.app.services.ast_parsing_service import astParser
+from backend.app.services.liniting_service import run_pep8_linter
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
-from database.database import get_db
-from database.database import response_data
+from backend.app.database.database import get_db
+from backend.app.database.database import response_data
 
 from backend.app.scripts.run_scripts import format_analysis_results
 from backend.app.services.code_smells_service import check_code_smell
