@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from backend.app.api.v1 import api_router
-from database.database import init_db,get_db
+from backend.app.database.database import init_db,get_db
 
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.api.v1.endpoints import update_env
