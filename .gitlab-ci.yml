@@ -48,18 +48,3 @@ run_api:
     expire_in: 1 week
 
 
-analyse:
-  stage: analyse_code
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate
-    - export PYTHONPATH=$(pwd)
-    - echo "Running custom Python script"
-    - pip install litellm
-    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
-  artifacts:
-    paths:
-      - report.md
-    expire_in: 1 week
-
