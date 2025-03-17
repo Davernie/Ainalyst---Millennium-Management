@@ -3,7 +3,6 @@ image: python:3.12
 
 stages:
   - setting_up
-  - analyse_code
   - run_api
 
 setup:
@@ -35,7 +34,7 @@ run_api:
     - docker
   script:
     - source venv/bin/activate
-    - pip install uvicorn requests
+    - pip install fastapi uvicorn requests
     - echo "Starting API with uvicorn"
     - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
     - sleep 5
