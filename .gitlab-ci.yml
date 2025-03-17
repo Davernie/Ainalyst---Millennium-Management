@@ -3,6 +3,7 @@ image: python:3.12
 stages:
   - setting_up
   - analyse_code
+  - run_api
 
 setup:
   stage: setting_up
@@ -21,6 +22,25 @@ setup:
   artifacts:
     paths:
       - venv/
+    expire_in: 1 week
+
+run_api:
+  stage: run_api
+  tags:
+    - docker
+  script:
+    - source venv/bin/activate
+    - pip install uvicorn requests
+    - echo "Starting API with uvicorn"
+    - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
+    - sleep 5  # Wait for the server to start
+    - echo "Sending request to the API"
+    - curl -X GET http://127.0.0.1:8000/analyze -o response.json  # Send a request to the running API
+    - cat response.json
+
+  artifacts:
+    paths:
+      - response.json
     expire_in: 1 week
 
 
