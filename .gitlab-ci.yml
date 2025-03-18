@@ -52,14 +52,20 @@ generate_pr:
   script:
     - source venv/bin/activate
     - echo "Generating PR Title and Description"
+
+    - PR_TITLE="$(git log -1 --pretty=format:'%s') - $(git diff --name-only HEAD~1 | head -3 | tr '\n' ', ')"
     - echo "### PR Title" > pr_description.md
+    - echo "$PR_TITLE" >> pr_description.md
     - echo "" >> pr_description.md
+
     - echo "#### Key Findings:" >> pr_description.md
-    - cat report.md | tail -n 10 >> pr_description.md  # Include the last 10 lines of the report
+    - awk '/### Explanation of Changes/ {flag=1; next} flag' report.md >> pr_description.md
     - echo "" >> pr_description.md
-    - echo "#### Recent Code Changes:" >> pr_description.md
+
+    - echo "#### Summary of Changes:" >> pr_description.md
     - git diff --name-status HEAD~1 >> pr_description.md  # Add modified files
     - echo "" >> pr_description.md
+
     - echo "#### Commit Logs:" >> pr_description.md
     - git log -3 --pretty=format:"- %h %s" >> pr_description.md  # Last 3 commits
   artifacts:
