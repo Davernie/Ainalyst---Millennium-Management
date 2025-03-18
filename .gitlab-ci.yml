@@ -4,6 +4,7 @@ stages:
   - cleanup
   - setting_up
   - analyse_code
+  - generate_pr
   - run_api
 
 
@@ -41,4 +42,27 @@ analyse:
   artifacts:
     paths:
       - report.md
+    expire_in: 1 week
+
+
+generate_pr:
+  stage: generate_pr
+  tags:
+    - docker
+  script:
+    - source venv/bin/activate
+    - echo "Generating PR Title and Description"
+    - echo "### PR Title" > pr_description.md
+    - echo "" >> pr_description.md
+    - echo "#### Key Findings:" >> pr_description.md
+    - cat report.md | tail -n 10 >> pr_description.md  # Include the last 10 lines of the report
+    - echo "" >> pr_description.md
+    - echo "#### Recent Code Changes:" >> pr_description.md
+    - git diff --name-status HEAD~1 >> pr_description.md  # Add modified files
+    - echo "" >> pr_description.md
+    - echo "#### Commit Logs:" >> pr_description.md
+    - git log -3 --pretty=format:"- %h %s" >> pr_description.md  # Last 3 commits
+  artifacts:
+    paths:
+      - pr_description.md
     expire_in: 1 week
