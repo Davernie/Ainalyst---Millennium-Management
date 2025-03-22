@@ -7,6 +7,7 @@ stages:
   - generate_pr
   - run_api
 
+
 setup:
   stage: setting_up
   tags:
@@ -14,11 +15,11 @@ setup:
   script:
     - python --version
     - pip --version
-    - python -m venv venv
-    - source venv/bin/activate
-    - pip install --upgrade pip ruff flake8
+    - python -m venv venv  # Create a virtual environment
+    - source venv/bin/activate # So requirements can be used across diff jobs
+    - pip install --upgrade pip ruff flake8  # Install requirements
   cache:
-    key: requirements
+    key: requirements    #cache/store dependencies
     paths:
       - venv/
   artifacts:
@@ -26,25 +27,62 @@ setup:
       - venv/
     expire_in: 1 week
 
-run_api:
-  stage: run_api
+
+
+analyse:
+  stage: analyse_code
   tags:
     - docker
   script:
-    - python -m venv venv
     - source venv/bin/activate
-    - pip install -r backend/requirements.txt
-    - echo "Starting API with uvicorn"
-    - uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --log-level debug &
-    - sleep 50  # Give API time to start
-    - ps aux | grep uvicorn  # Check if Uvicorn is running
-    - echo "Waiting for API to be ready..."
-    - for i in {1..10}; do curl -s http://localhost:8000/health && break || sleep 5; done
-    - echo "Sending request to the API"
-    - curl -X GET http://localhost:8000/analyze -o response.json
-    - cat response.json
-
+    - export PYTHONPATH=$(pwd)
+    - echo "Running custom Python script"
+    - pip install litellm
+    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
   artifacts:
     paths:
-      - response.json
+      - report.md
+    expire_in: 1 week
+
+
+generate_pr:
+  stage: generate_pr
+  tags:
+    - docker
+  script:
+    - source venv/bin/activate
+    - echo "Generating PR Title and Description"
+
+    # Extract the first changed file
+    - CHANGED_FILE=$(git diff --name-only HEAD~1 | head -n 1)
+    # Extract the first line of the most recent commit message
+    - FIRST_COMMIT=$(git log -1 --pretty=format:"%s")
+    # Get type of modification
+    - CHANGES_STATUS="$(git diff --name-status HEAD~1)"
+    - |
+      if echo "$CHANGES_STATUS" | grep -q "^M"; then
+          TYPE="Fix"
+      elif echo "$CHANGES_STATUS" | grep -q "^A"; then
+          TYPE="Feature"
+      elif echo "$CHANGES_STATUS" | grep -q "^D"; then
+          TYPE="Cleanup"
+      else
+          TYPE="Update"
+      fi
+    # Generate pr title based on it
+    - >-
+      PR_TITLE="$TYPE: Changes in \"$CHANGED_FILE\" - \"$FIRST_COMMIT\""
+    - echo "Generating PR Description..."
+    - echo "# $PR_TITLE" > pr_description.md
+    - echo "" >> pr_description.md
+
+    - echo "#### Summary of Changes:" >> pr_description.md
+    - git diff --name-status HEAD~1 >> pr_description.md  # Add modified files
+    - echo "" >> pr_description.md
+
+    - echo "#### Commit Logs:" >> pr_description.md
+    - git log -3 --pretty=format:"- %h %s" >> pr_description.md  # Last 3 commits
+  artifacts:
+    paths:
+      - pr_description.md
     expire_in: 1 week
