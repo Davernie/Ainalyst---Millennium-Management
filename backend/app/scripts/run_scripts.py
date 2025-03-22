@@ -1,84 +1,85 @@
 import argparse
+import json
+from datetime import datetime
+from sqlalchemy import create_engine, Table, MetaData, insert
+from sqlalchemy.orm import sessionmaker
 
 from backend.app.services.ast_parsing_service import astParser
 from backend.app.services.code_smells_service import check_code_smell
 from backend.app.services.liniting_service import run_pep8_linter
 
+# Database connection setup
+DATABASE_URL = "postgresql://avnadmin:AVNS_PHe8kYKlH-dJGHhLQDG@pgtest-syedbelalhyder-d2f6.i.aivencloud.com:24584/defaultdb?sslmode=require"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+metadata = MetaData()
+response_data = Table("response_data", metadata, autoload_with=engine)
+
 
 def analyze_code(code):
     """Analyze Python code for AST issues and PEP8 violations."""
-
-    # Run AST analysis
     ast_parser = astParser()
     ast_issues = ast_parser.analyze(code)
-
-    # Run PEP8 compliance check
     pep8_issues = run_pep8_linter(code)
-
     code_smells = check_code_smell(code)
 
-    # # Store the response in the database
-    # result = db.execute(
-    #     response_data.insert().values(
-    #         timestamp=datetime.utcnow(),
-    #         code=code,
-    #         report_response=json.dumps({
-    #             "AST Issues": ast_issues if ast_issues else "No AST issues found.",
-    #             "PEP8 Issues": pep8_issues,
-    #             "Code Smells": code_smells  # todo: Once I have API KEY, we can add code_smells
-    #         })
-    #     ).returning(response_data.c.id)
-    # )
-    # db.commit()
-
-
-    # inserted_id = result.fetchone()[0]  # Fetch the id from the result tuple
-
     return {
-        #"Status": f"Successfully Added information in Database with id: {inserted_id}",
-        "Status": "Successfully Parsed, but not added to db",
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues,
         "Code Smells": code_smells
     }
 
 
-def format_analysis_results(results):
-    """Format and print the analysis results in a structured, readable way."""
+def save_to_db(code, analysis_result):
+    """Save analysis result to the database and return the inserted ID."""
+    db = SessionLocal()
+    try:
+        stmt = insert(response_data).values(
+            username="Gitlab CI",
+            filename="test",
+            timestamp=datetime.utcnow(),
+            code=json.dumps(code),
+            report_response=json.dumps(analysis_result)
+        ).returning(response_data.c.id)
 
+        result = db.execute(stmt)
+        db.commit()
+        inserted_id = result.fetchone()[0]  # Fetch inserted ID
+        return inserted_id
+    except Exception as e:
+        db.rollback()
+        print(f"Database insertion failed: {e}")
+        return None
+    finally:
+        db.close()
+
+
+def format_analysis_results(results, inserted_id):
+    """Format and print the analysis results with the inserted database ID."""
     print("# Code Analysis Report\n")
-
-    # Print Status
-    print(f"## Status\n{results['Status']}\n")
-
-    # Print AST Issues
+    print(f"## Status\nSuccessfully Added to Database with ID: {inserted_id}\n")
     print("## AST Issues")
-    if isinstance(results['AST Issues'], list) and results['AST Issues']:
-        for issue in results['AST Issues']:
-            print(f"- {issue}")
-    else:
-        print("- No AST issues found.")
-    print("")
+    print("\n".join(f"- {issue}" for issue in results["AST Issues"]) if results[
+        "AST Issues"] else "- No AST issues found.")
+    print("\n## PEP8 Compliance")
+    print(results["PEP8 Issues"].strip() if results["PEP8 Issues"] else "All checks passed!\n")
+    print("\n## Code Smells")
+    print(results["Code Smells"].strip() if results["Code Smells"] else "No code smells detected.\n")
 
-    # Print PEP8 Issues
-    print("## PEP8 Compliance\n")
-    print(results['PEP8 Issues'].strip() if results['PEP8 Issues'] else "All checks passed!\n")
-
-    # Print Code Smells
-    print("## Code Smells\n")
-    print(results['Code Smells'].strip() if results['Code Smells'] else "No code smells detected.\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to run Linter, Parser & Code Smell Checker")
-    parser.add_argument("--filePath", type=str, help="First argument")
+    parser.add_argument("--filePath", type=str, help="Path to the file to analyze")
     args = parser.parse_args()
-    print("Trying to open file: ", args.filePath)
+
     try:
         with open(args.filePath, "r") as file:
             code = file.read()
             result = analyze_code(code)
-            format_analysis_results(result)
-
+            inserted_id = save_to_db(code, result)
+            if inserted_id:
+                format_analysis_results(result, inserted_id)
+            else:
+                print("Error: Could not save results to database.")
     except FileNotFoundError:
         print("Error: File not found.")
-
