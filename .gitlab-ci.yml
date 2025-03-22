@@ -36,7 +36,7 @@ run_api:
     - pip install -r backend/requirements.txt
     - echo "Starting API with uvicorn"
     - uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --log-level debug &
-    - sleep 5  # Give API time to start
+    - sleep 50  # Give API time to start
     - ps aux | grep uvicorn  # Check if Uvicorn is running
     - echo "Waiting for API to be ready..."
     - for i in {1..10}; do curl -s http://localhost:8000/health && break || sleep 5; done
