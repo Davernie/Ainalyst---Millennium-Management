@@ -10,7 +10,9 @@ git pull
 
    pip install -r backend/temporary_file.txt
 
-   pip install -r frontend/requirements.txt
+   cd frontend
+
+   npm install
 
 3. Run the backend. In your IDE open backend/app/main.py, and run it.
 

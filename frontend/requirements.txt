@@ -1,3 +1,0 @@
-react-router-dom~=7.1.15
-npm~=10.9.2
-react~=19.0.0
