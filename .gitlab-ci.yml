@@ -39,9 +39,9 @@ run_api:
     - sleep 5  # Give API time to start
     - ps aux | grep uvicorn  # Check if Uvicorn is running
     - echo "Waiting for API to be ready..."
-    - for i in {1..10}; do curl -s http://127.0.0.1:8000/health && break || sleep 5; done
+    - for i in {1..10}; do curl -s http://localhost:8000/health && break || sleep 5; done
     - echo "Sending request to the API"
-    - curl -X GET http://127.0.0.1:8000/analyze -o response.json
+    - curl -X GET http://localhost:8000/analyze -o response.json
     - cat response.json
 
   artifacts:
