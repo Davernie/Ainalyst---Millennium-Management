@@ -37,7 +37,7 @@ analyse:
     - source venv/bin/activate
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
-    - pip install litellm
+    - pip install -r backend/requirements.txt
     - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
   artifacts:
     paths:
