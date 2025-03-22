@@ -18,7 +18,8 @@ DB_PORT = os.getenv("DB_PORT", "5432")  # Default to 5432 if not specified
 DB_NAME = os.getenv("DB_NAME")
 
 # Construct the DATABASE_URL
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+#DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = "postgresql://avnadmin:AVNS_PHe8kYKlH-dJGHhLQDG@pgtest-syedbelalhyder-d2f6.i.aivencloud.com:24584/defaultdb?sslmode=require"
 
 # Print connection message
 print(f"Connecting to database: {DATABASE_URL}")
