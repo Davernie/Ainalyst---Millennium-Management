@@ -34,7 +34,7 @@ analyse:
   tags:
     - docker
   script:
-    - apt-get update && apt-get install -y netcat
+    - apt-get update && apt-get install -y netcat-openbsd
     - source venv/bin/activate
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
