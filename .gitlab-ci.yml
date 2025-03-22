@@ -35,6 +35,7 @@ analyse:
     - docker
   script:
     - apt-get update && apt-get install -y netcat-openbsd
+    - apt-get update && apt-get install -y dnsutils
     - source venv/bin/activate
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
