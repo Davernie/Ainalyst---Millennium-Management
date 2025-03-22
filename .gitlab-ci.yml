@@ -28,61 +28,23 @@ setup:
     expire_in: 1 week
 
 
-
-analyse:
-  stage: analyse_code
+run_api:
+  stage: run_api
   tags:
     - docker
   script:
     - source venv/bin/activate
-    - export PYTHONPATH=$(pwd)
-    - echo "Running custom Python script"
-    - pip install litellm
-    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
+    - pip install -r backend/requirements.txt
+    - echo "Starting API with uvicorn"
+    - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
+    - sleep 5
+    - echo "Sending request to the API"
+    - curl -X GET http://127.0.0.1:8000/analyze -o response.json  # Send a request to the running API
+    - cat response.json
+
   artifacts:
     paths:
-      - report.md
+      - response.json
     expire_in: 1 week
 
 
-generate_pr:
-  stage: generate_pr
-  tags:
-    - docker
-  script:
-    - source venv/bin/activate
-    - echo "Generating PR Title and Description"
-
-    # Extract the first changed file 
-    - CHANGED_FILE=$(git diff --name-only HEAD~1 | head -n 1)
-    # Extract the first line of the most recent commit message
-    - FIRST_COMMIT=$(git log -1 --pretty=format:"%s")
-    # Get type of modification
-    - CHANGES_STATUS="$(git diff --name-status HEAD~1)"
-    - |
-      if echo "$CHANGES_STATUS" | grep -q "^M"; then
-          TYPE="Fix"
-      elif echo "$CHANGES_STATUS" | grep -q "^A"; then
-          TYPE="Feature"
-      elif echo "$CHANGES_STATUS" | grep -q "^D"; then
-          TYPE="Cleanup"
-      else
-          TYPE="Update"
-      fi
-    # Generate pr title based on it 
-    - >-
-      PR_TITLE="$TYPE: Changes in \"$CHANGED_FILE\" - \"$FIRST_COMMIT\""
-    - echo "Generating PR Description..."
-    - echo "# $PR_TITLE" > pr_description.md
-    - echo "" >> pr_description.md
-
-    - echo "#### Summary of Changes:" >> pr_description.md
-    - git diff --name-status HEAD~1 >> pr_description.md  # Add modified files
-    - echo "" >> pr_description.md
-
-    - echo "#### Commit Logs:" >> pr_description.md
-    - git log -3 --pretty=format:"- %h %s" >> pr_description.md  # Last 3 commits
-  artifacts:
-    paths:
-      - pr_description.md
-    expire_in: 1 week
