@@ -38,7 +38,6 @@ analyse:
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
     - pip install -r backend/requirements.txt
-    - curl ifconfig.me
     - nc -zv pgtest-syedbelalhyder-d2f6.i.aivencloud.com 24584 || echo "Database connection failed"
     - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
   artifacts:
