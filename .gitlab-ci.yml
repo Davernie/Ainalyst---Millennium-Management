@@ -35,9 +35,11 @@ run_api:
     - source venv/bin/activate
     - pip install -r backend/requirements.txt
     - echo "Starting API with uvicorn"
-    - nohup uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 > api.log 2>&1 &
+    - uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --log-level debug &
+    - sleep 5  # Give API time to start
+    - ps aux | grep uvicorn  # Check if Uvicorn is running
     - echo "Waiting for API to be ready..."
-    - for i in {1..10}; do curl -s http://127.0.0.1:8000/analyze && break || sleep 5; done
+    - for i in {1..10}; do curl -s http://127.0.0.1:8000/health && break || sleep 5; done
     - echo "Sending request to the API"
     - curl -X GET http://127.0.0.1:8000/analyze -o response.json
     - cat response.json
