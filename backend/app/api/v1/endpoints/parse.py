@@ -47,7 +47,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
             report_response=json.dumps({
                 "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                 "PEP8 Issues": pep8_issues,
-                "Code Smells": code_smells  # todo: Once I have API KEY, we can add code_smells
+                "Code Smells": code_smells
             })
         ).returning(response_data.c.id)
     )
@@ -67,7 +67,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
                 report_response=json.dumps({
                     "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                     "PEP8 Issues": pep8_issues,
-                    "Code Smells": "Once I have API KEY, we can add code_smells"  # todo: Once I have API KEY, we can add code_smells
+                    "Code Smells": code_smells
                 })
             ).returning(response_data.c.id)
         )
@@ -87,7 +87,7 @@ async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
         "id": inserted_id,  # Add the id explicitly here
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues,
-        "Code Smells": code_smells         #todo: Uncomment Once you have API KEY
+        "Code Smells": code_smells
     }
 
 
