@@ -20,43 +20,53 @@ function Home() {
   };
 
   const analyzeCode = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
-  setApiResponse(null);
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setApiResponse(null);
 
-  console.log("Fetching logs for:", username, filePath);
+    console.log("Fetching logs for:", username, filePath);
 
-  try {
-    const response = await fetch("http://localhost:8080/analyze", {
+    try {
+      const response = await fetch("http://localhost:8080/analyze", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            code: fileContent,
-            userName: username,
-            fileName: filePath
-        })
-    });
+          code: fileContent,
+          userName: username,
+          fileName: filePath,
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("API Response:", data);
+
+      setApiResponse(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const data = await response.json();
-    console.log("API Response:", data);  // This should show the full response including `id`
+  const getBoxBackgroundColor = (astIssues, pep8Issues) => {
+    // Ensure astIssues and pep8Issues are arrays
+    const astIssuesArray = Array.isArray(astIssues) ? astIssues : [astIssues];
+    const pep8IssuesArray = Array.isArray(pep8Issues) ? pep8Issues : [pep8Issues];
 
-    setApiResponse(data); // Set the response data, including the id
-
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+    if (astIssuesArray.some(issue => issue.includes("Error")) || pep8IssuesArray.some(issue => issue.includes("Error"))) {
+      return "lightcoral"; // Light red background
+    } else if (astIssuesArray.some(issue => issue.includes("Warning")) || pep8IssuesArray.some(issue => issue.includes("Warning"))) {
+      return "lightyellow"; // Light yellow background
+    }
+    return "transparent";
+  };
 
   return (
     <div className="page-container">
@@ -92,20 +102,45 @@ function Home() {
   </form>
 
 
-      {/* Display API Response */}
       {error && <p style={{ color: "red" }}>ERROR: {error}</p>}
       {apiResponse && (
-          <div>
-            <h3>Analysis Results:</h3>
-            <p><strong>Status:</strong> {apiResponse.Status}</p> {/* Display the status */}
-            <p><strong>Request ID:</strong> {apiResponse.id}</p>  {/* Display the id explicitly */}
-            <p><strong>AST Issues:</strong></p>
-            <pre>{JSON.stringify(apiResponse["AST Issues"], null, 2)}</pre>
-            <p><strong>PEP8 Issues:</strong></p>
-            <pre>{JSON.stringify(apiResponse["PEP8 Issues"], null, 2)}</pre>
+        <div>
+          <h3>Analysis Results:</h3>
+          <div
+            style={{
+              marginBottom: "20px",
+              border: "1px solid #ccc",
+              padding: "10px",
+              backgroundColor: getBoxBackgroundColor(
+                apiResponse["AST Issues"],
+                apiResponse["PEP8 Issues"]
+              ),
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            <p><strong>Status:</strong> {apiResponse.Status}</p>
+            <p><strong>Request ID:</strong> {apiResponse.id}</p>
+            <strong>AST Issues:</strong>
+            {Array.isArray(apiResponse["AST Issues"]) ? (
+              apiResponse["AST Issues"].map((issue, idx) => (
+                <div key={idx}>{issue}</div>
+              ))
+            ) : (
+              <div>{apiResponse["AST Issues"]}</div>
+            )}
+            <br />
+            {Array.isArray(apiResponse["PEP8 Issues"]) ? (
+              apiResponse["PEP8 Issues"].map((issue, idx) => (
+                <div key={idx}>{issue}</div>
+              ))
+            ) : (
+              <div>{apiResponse["PEP8 Issues"]}</div>
+            )}
+            <br />
+            <strong>Code Smells:</strong> {apiResponse["Code Smells"]}
           </div>
-        )}
-
+        </div>
+      )}
     </div>
   );
 }

@@ -44,6 +44,21 @@ async def analyze_code(data: CodeInput, db: Session = Depends(get_db)):
     pep8_issues = run_pep8_linter(code)
     code_smells = check_code_smell(code)
     # Store the response in the database
+    result = db.execute(
+        response_data.insert().values(
+            timestamp=datetime.utcnow(),
+            code=code,
+            report_response=json.dumps({
+                "AST Issues": ast_issues if ast_issues else "No AST issues found.",
+                "PEP8 Issues": pep8_issues,
+                "Code Smells": code_smells
+            })
+        ).returning(response_data.c.id)
+    )
+    db.commit()
+
+
+    inserted_id = result.fetchone()[0]  # Fetch the id from the result tuple
 
     try:
         print("sending to db")
@@ -56,7 +71,7 @@ async def analyze_code(data: CodeInput, db: Session = Depends(get_db)):
                 report_response=json.dumps({
                     "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                     "PEP8 Issues": pep8_issues,
-                    "Code Smells": code_smells,
+                    "Code Smells": code_smells
                 })
             ).returning(response_data.c.id)
         )
