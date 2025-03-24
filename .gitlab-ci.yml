@@ -43,7 +43,7 @@ analyse:
     - curl -I https://www.google.com || echo "No internet access"
     - nslookup pgtest-syedbelalhyder-d2f6.i.aivencloud.com || echo "DNS resolution failed"
     - nc -zv pgtest-syedbelalhyder-d2f6.i.aivencloud.com 24584 || echo "Database connection failed"
-    - python backend/app/scripts/run_scripts.py --filePath backend/app/scripts/fileForTesting.py > report.md 2>&1 || true
+    - python backend/app/scripts/analyze_codebase_script.py --dirPath backend/codebase > report.md 2>&1 || true
   artifacts:
     paths:
       - report.md
