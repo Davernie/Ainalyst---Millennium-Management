@@ -11,7 +11,7 @@ from backend.app.services.code_smells_service import check_code_smell
 from backend.app.services.liniting_service import run_pep8_linter
 
 # Database connection setup
-DATABASE_URL = "postgresql://avnadmin:AVNS_PHe8kYKlH-dJGHhLQDG@pgtest-syedbelalhyder-d2f6.i.aivencloud.com:24584/defaultdb?sslmode=require"
+DATABASE_URL = "postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 metadata = MetaData()
