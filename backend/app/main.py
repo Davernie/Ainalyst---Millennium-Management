@@ -12,8 +12,8 @@ from backend.app.api.v1.endpoints import update_env
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting up... Connecting to DB and ensuring table exists.")
-    init_db()  # Ensure table exists on startup
-    yield  # Application runs
+    init_db()
+    yield
     print("Shutting down...")
 
 # Attach lifespan to FastAPI
@@ -29,15 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-print("📌 Manually testing database connection...")
-db = next(get_db())  # Manually get a session
 
-try:
-    print("✅ Successfully created a database session!")
-except Exception as e:
-    print(f"❌ Failed to create session: {e}")
-finally:
-    db.close()
 
 print("📌 Available routes:")
 for route in app.routes:
