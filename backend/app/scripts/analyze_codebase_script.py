@@ -1,0 +1,92 @@
+import argparse
+import json
+import os
+from datetime import datetime
+from sqlalchemy import create_engine, Table, MetaData, insert
+from sqlalchemy.orm import sessionmaker
+from pathlib import Path
+
+from backend.app.services.ast_parsing_service import astParser
+from backend.app.services.code_smells_service import check_code_smell
+from backend.app.services.liniting_service import run_pep8_linter
+
+# Database connection setup
+DATABASE_URL = "postgresql://avnadmin:AVNS_PHe8kYKlH-dJGHhLQDG@pgtest-syedbelalhyder-d2f6.i.aivencloud.com:24584/defaultdb?sslmode=require"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+metadata = MetaData()
+response_data = Table("response_data", metadata, autoload_with=engine)
+
+def analyze_code(code):
+    """Analyze Python code for AST issues, PEP8 violations, and code smells."""
+    ast_parser = astParser()
+    ast_issues = ast_parser.analyze(code)
+    pep8_issues = run_pep8_linter(code)
+    code_smells = check_code_smell(code)
+
+    return {
+        "AST Issues": ast_issues if ast_issues else "No AST issues found.",
+        "PEP8 Issues": pep8_issues,
+        "Code Smells": code_smells
+    }
+
+def save_to_db(filename, code, analysis_result):
+    """Save analysis results to the database and return the inserted ID."""
+    db = SessionLocal()
+    try:
+        stmt = insert(response_data).values(
+            username="Gitlab CI",
+            filename=filename,
+            timestamp=datetime.utcnow(),
+            code=json.dumps(code),
+            report_response=json.dumps(analysis_result)
+        ).returning(response_data.c.id)
+
+        result = db.execute(stmt)
+        db.commit()
+        inserted_id = result.fetchone()[0]
+        return inserted_id
+    except Exception as e:
+        db.rollback()
+        print(f"Database insertion failed for {filename}: {e}")
+        return None
+    finally:
+        db.close()
+
+def format_analysis_results(filename, results, inserted_id):
+    """Format and print the analysis results with the inserted database ID."""
+    print(f"\n# Code Analysis Report for {filename}\n")
+    print(f"## Status: Successfully Added to Database with ID: {inserted_id}\n")
+    print("## AST Issues")
+    print("\n".join(f"- {issue}" for issue in results["AST Issues"]) if results["AST Issues"] else "- No AST issues found.")
+    print("\n## PEP8 Compliance")
+    print(results["PEP8 Issues"].strip() if results["PEP8 Issues"] else "All checks passed!\n")
+    print("\n## Code Smells")
+    print(results["Code Smells"].strip() if results["Code Smells"] else "No code smells detected.\n")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Script to analyze all Python files in a given directory.")
+    parser.add_argument("--dirPath", type=str, required=True, help="Path to the directory to analyze")
+    args = parser.parse_args()
+
+    directory_path = Path(args.dirPath).resolve()
+
+    if not directory_path.exists() or not directory_path.is_dir():
+        print("Error: Provided path is not a valid directory.")
+        exit(1)
+
+    for root, _, files in os.walk(directory_path):
+        for file in files:
+            if file.endswith(".py"):
+                file_path = Path(root) / file
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        code = f.read()
+                        result = analyze_code(code)
+                        inserted_id = save_to_db(file, code, result)
+                        if inserted_id:
+                            format_analysis_results(file, result, inserted_id)
+                        else:
+                            print(f"Error: Could not save results for {file} to database.")
+                except Exception as e:
+                    print(f"Error processing {file}: {e}")
