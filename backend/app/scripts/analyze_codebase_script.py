@@ -1,8 +1,6 @@
 import argparse
 import json
 import os
-import socket
-import socks
 from datetime import datetime
 from sqlalchemy import create_engine, Table, MetaData, insert
 from sqlalchemy.orm import sessionmaker
@@ -12,62 +10,12 @@ from backend.app.services.ast_parsing_service import astParser
 from backend.app.services.code_smells_service import check_code_smell
 from backend.app.services.liniting_service import run_pep8_linter
 
-# SOCKS proxy configuration
-SOCKS_PROXY_HOST = "socks-proxy.scss.tcd.ie"
-SOCKS_PROXY_PORT = 1080
-
-
-# Function to detect if we need to use the proxy
-def is_college_environment():
-    """Check if we're in the college environment that needs a proxy"""
-    DB_HOST = "pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com"
-    DB_PORT = 26260
-
-    try:
-        # Try to connect directly to the database
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(2)  # 2 second timeout
-        result = s.connect_ex((DB_HOST, DB_PORT))
-        s.close()
-
-        # If we can connect directly, we don't need the proxy
-        if result == 0:
-            return False
-        return True
-    except:
-        # If any error, assume we need the proxy
-        return True
-
-
-# Apply the SOCKS proxy if needed
-def setup_database_connection():
-    """Set up the database connection with proxy if needed"""
-    # Database connection setup
-    DATABASE_URL = "postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require"
-
-    # Check if we need to use the proxy
-    if is_college_environment():
-        print(f"Using SOCKS proxy at {SOCKS_PROXY_HOST}:{SOCKS_PROXY_PORT}")
-        # Set up SOCKS proxy
-        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, SOCKS_PROXY_HOST, SOCKS_PROXY_PORT)
-        # Replace the socket module
-        original_socket = socket.socket
-        socket.socket = socks.socksocket
-    else:
-        print("Connecting directly to database without proxy")
-
-    # Create engine and session
-    engine = create_engine(DATABASE_URL)
-    SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-    metadata = MetaData()
-    response_data = Table("response_data", metadata, autoload_with=engine)
-
-    # If we used the proxy, restore the original socket
-    if is_college_environment():
-        socket.socket = original_socket
-
-    return engine, SessionLocal, metadata, response_data
-
+# Database connection setup
+DATABASE_URL = "postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+metadata = MetaData()
+response_data = Table("response_data", metadata, autoload_with=engine)
 
 def analyze_code(code):
     """Analyze Python code for AST issues, PEP8 violations, and code smells."""
@@ -82,15 +30,8 @@ def analyze_code(code):
         "Code Smells": code_smells
     }
 
-
-def save_to_db(response_data, SessionLocal, filename, code, analysis_result):
+def save_to_db(filename, code, analysis_result):
     """Save analysis results to the database and return the inserted ID."""
-    # Check if we need to use the proxy for the database connection
-    original_socket = socket.socket
-    if is_college_environment():
-        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, SOCKS_PROXY_HOST, SOCKS_PROXY_PORT)
-        socket.socket = socks.socksocket
-
     db = SessionLocal()
     try:
         stmt = insert(response_data).values(
@@ -111,23 +52,17 @@ def save_to_db(response_data, SessionLocal, filename, code, analysis_result):
         return None
     finally:
         db.close()
-        # Restore the original socket if we used the proxy
-        if is_college_environment():
-            socket.socket = original_socket
-
 
 def format_analysis_results(filename, results, inserted_id):
     """Format and print the analysis results with the inserted database ID."""
     print(f"\n# Code Analysis Report for {filename}\n")
     print(f"## Status: Successfully Added to Database with ID: {inserted_id}\n")
     print("## AST Issues")
-    print("\n".join(f"- {issue}" for issue in results["AST Issues"]) if results[
-        "AST Issues"] else "- No AST issues found.")
+    print("\n".join(f"- {issue}" for issue in results["AST Issues"]) if results["AST Issues"] else "- No AST issues found.")
     print("\n## PEP8 Compliance")
     print(results["PEP8 Issues"].strip() if results["PEP8 Issues"] else "All checks passed!\n")
     print("\n## Code Smells")
     print(results["Code Smells"].strip() if results["Code Smells"] else "No code smells detected.\n")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to analyze all Python files in a given directory.")
@@ -140,9 +75,6 @@ if __name__ == "__main__":
         print("Error: Provided path is not a valid directory.")
         exit(1)
 
-    # Set up database connection with proxy if needed
-    engine, SessionLocal, metadata, response_data = setup_database_connection()
-
     for root, _, files in os.walk(directory_path):
         for file in files:
             if file.endswith(".py"):
@@ -151,7 +83,7 @@ if __name__ == "__main__":
                     with open(file_path, "r", encoding="utf-8") as f:
                         code = f.read()
                         result = analyze_code(code)
-                        inserted_id = save_to_db(response_data, SessionLocal, file, code, result)
+                        inserted_id = save_to_db(file, code, result)
                         if inserted_id:
                             format_analysis_results(file, result, inserted_id)
                         else:
