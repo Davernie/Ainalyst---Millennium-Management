@@ -22,14 +22,14 @@ setup:
     - pip --version
     - python -m venv venv  # Create a virtual environment
     - source venv/bin/activate  # Activate the venv
-    # Temporarily unset proxy variables for pip upgrade (to avoid proxy issues)
+    # Temporarily unset proxy variables for pip upgrade (to avoid using the proxy before PySocks is installed)
     - unset HTTP_PROXY && unset HTTPS_PROXY
     - pip install --upgrade pip setuptools wheel
     # Restore proxy variables
     - export HTTP_PROXY="socks5h://proxy.scss.tcd.ie:1080"
     - export HTTPS_PROXY="socks5h://proxy.scss.tcd.ie:1080"
-    # Install required packages, pinning PySocks to version 1.7.1
-    - pip install ruff flake8 PySocks==1.7.1
+    # Install required packages, forcing a source build for PySocks
+    - pip install ruff flake8 PySocks --no-binary :all:
   cache:
     key: requirements
     paths:
