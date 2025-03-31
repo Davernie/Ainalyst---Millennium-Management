@@ -26,7 +26,7 @@ SOCKS_PROXY_PORT = 1080
 def is_college_environment():
     """
     Check if a direct connection to the database is possible.
-    Returns False if direct connection is successful, True otherwise.
+    Returns False if a direct connection is successful, True otherwise.
     """
     DB_HOST = "pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com"
     DB_PORT = 26260

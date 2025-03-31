@@ -16,13 +16,15 @@ setup:
   tags:
     - docker
   script:
-    # Install system-level dependencies needed for PySocks (including libssl-dev)
+    # Install system-level dependencies needed for building Python packages
     - apt-get update && apt-get install -y build-essential libffi-dev python3-dev libssl-dev
     - python --version
     - pip --version
     - python -m venv venv  # Create a virtual environment
     - source venv/bin/activate  # Activate the venv so dependencies can be used across jobs
-    - pip install --upgrade pip ruff flake8 pysocks  # Install required packages including pysocks
+    # Install wheel first to ensure proper building of any packages
+    - pip install --upgrade pip wheel
+    - pip install ruff flake8 pysocks  # Install required packages including pysocks
   cache:
     key: requirements
     paths:
