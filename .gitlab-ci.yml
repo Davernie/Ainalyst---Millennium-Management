@@ -16,13 +16,14 @@ setup:
   tags:
     - docker
   script:
+    - apt-get update && apt-get install -y build-essential libffi-dev python3-dev
     - python --version
     - pip --version
     - python -m venv venv  # Create a virtual environment
     - source venv/bin/activate # Activate the venv so dependencies can be used across jobs
     - pip install --upgrade pip ruff flake8 pysocks  # Install required packages including pysocks
   cache:
-    key: requirements    # Cache/store dependencies
+    key: requirements
     paths:
       - venv/
   artifacts:
@@ -35,8 +36,7 @@ analyse:
   tags:
     - docker
   script:
-    - apt-get update && apt-get install -y netcat-openbsd
-    - apt-get update && apt-get install -y dnsutils
+    - apt-get update && apt-get install -y netcat-openbsd dnsutils
     - source venv/bin/activate
     - export PYTHONPATH=$(pwd)
     - echo "Running custom Python script"
@@ -80,10 +80,10 @@ generate_pr:
     - echo "# $PR_TITLE" > pr_description.md
     - echo "" >> pr_description.md
     - echo "#### Summary of Changes:" >> pr_description.md
-    - git diff --name-status HEAD~1 >> pr_description.md  # Add modified files
+    - git diff --name-status HEAD~1 >> pr_description.md
     - echo "" >> pr_description.md
     - echo "#### Commit Logs:" >> pr_description.md
-    - git log -3 --pretty=format:"- %h %s" >> pr_description.md  # Last 3 commits
+    - git log -3 --pretty=format:"- %h %s" >> pr_description.md
   artifacts:
     paths:
       - pr_description.md
