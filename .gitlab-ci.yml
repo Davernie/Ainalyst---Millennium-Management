@@ -16,20 +16,16 @@ setup:
   tags:
     - docker
   script:
-    # Install system-level dependencies needed for building packages (including PySocks)
-    - apt-get update && apt-get install -y build-essential libffi-dev python3-dev libssl-dev
-    - python --version
-    - pip --version
-    - python -m venv venv  # Create a virtual environment
-    - source venv/bin/activate  # Activate the venv
-    # Temporarily unset proxy variables for pip upgrade (to avoid using the proxy before PySocks is installed)
-    - unset HTTP_PROXY && unset HTTPS_PROXY
-    - pip install --upgrade pip setuptools wheel
-    # Restore proxy variables
-    - export HTTP_PROXY="socks5h://proxy.scss.tcd.ie:1080"
-    - export HTTPS_PROXY="socks5h://proxy.scss.tcd.ie:1080"
-    # Install required packages, forcing a source build for PySocks
-    - pip install ruff flake8 PySocks --no-binary :all:
+    - "apt-get update && apt-get install -y build-essential libffi-dev python3-dev libssl-dev"
+    - "python --version"
+    - "pip --version"
+    - "python -m venv venv"
+    - "source venv/bin/activate"
+    - "unset HTTP_PROXY && unset HTTPS_PROXY"
+    - "pip install --upgrade pip setuptools wheel"
+    - "export HTTP_PROXY=\"socks5h://proxy.scss.tcd.ie:1080\""
+    - "export HTTPS_PROXY=\"socks5h://proxy.scss.tcd.ie:1080\""
+    - "pip install ruff flake8 PySocks --no-binary :all:"
   cache:
     key: requirements
     paths:
@@ -44,15 +40,15 @@ analyse:
   tags:
     - docker
   script:
-    - apt-get update && apt-get install -y netcat-openbsd dnsutils
-    - source venv/bin/activate
-    - export PYTHONPATH=$(pwd)
-    - echo "Running custom Python script"
-    - pip install -r backend/requirements.txt
-    - curl -I https://www.google.com || echo "No internet access"
-    - nslookup pgtest-syedbelalhyder-d2f6.i.aivencloud.com || echo "DNS resolution failed"
-    - nc -zv pgtest-syedbelalhyder-d2f6.i.aivencloud.com 24584 || echo "Database connection failed"
-    - python backend/app/scripts/analyze_codebase_script.py --dirPath backend/codebase > report.md 2>&1 || true
+    - "apt-get update && apt-get install -y netcat-openbsd dnsutils"
+    - "source venv/bin/activate"
+    - "export PYTHONPATH=$(pwd)"
+    - "echo 'Running custom Python script'"
+    - "pip install -r backend/requirements.txt"
+    - "curl -I https://www.google.com || echo 'No internet access'"
+    - "nslookup pgtest-syedbelalhyder-d2f6.i.aivencloud.com || echo 'DNS resolution failed'"
+    - "nc -zv pgtest-syedbelalhyder-d2f6.i.aivencloud.com 24584 || echo 'Database connection failed'"
+    - "python backend/app/scripts/analyze_codebase_script.py --dirPath backend/codebase > report.md 2>&1 || true"
   artifacts:
     paths:
       - report.md
@@ -63,14 +59,11 @@ generate_pr:
   tags:
     - docker
   script:
-    - source venv/bin/activate
-    - echo "Generating PR Title and Description"
-    # Extract the first changed file
-    - CHANGED_FILE=$(git diff --name-only HEAD~1 | head -n 1)
-    # Extract the first line of the most recent commit message
-    - FIRST_COMMIT=$(git log -1 --pretty=format:"%s")
-    # Get type of modification
-    - CHANGES_STATUS="$(git diff --name-status HEAD~1)"
+    - "source venv/bin/activate"
+    - "echo 'Generating PR Title and Description'"
+    - "CHANGED_FILE=$(git diff --name-only HEAD~1 | head -n 1)"
+    - "FIRST_COMMIT=$(git log -1 --pretty=format:'%s')"
+    - "CHANGES_STATUS=$(git diff --name-status HEAD~1)"
     - |
       if echo "$CHANGES_STATUS" | grep -q "^M"; then
           TYPE="Fix"
@@ -81,17 +74,15 @@ generate_pr:
       else
           TYPE="Update"
       fi
-    # Generate PR title based on it
-    - >-
-      PR_TITLE="$TYPE: Changes in \"$CHANGED_FILE\" - \"$FIRST_COMMIT\""
-    - echo "Generating PR Description..."
-    - echo "# $PR_TITLE" > pr_description.md
-    - echo "" >> pr_description.md
-    - echo "#### Summary of Changes:" >> pr_description.md
-    - git diff --name-status HEAD~1 >> pr_description.md
-    - echo "" >> pr_description.md
-    - echo "#### Commit Logs:" >> pr_description.md
-    - git log -3 --pretty=format:"- %h %s" >> pr_description.md
+    - "PR_TITLE=\"$TYPE: Changes in \\\"$CHANGED_FILE\\\" - \\\"$FIRST_COMMIT\\\"\""
+    - "echo 'Generating PR Description...'"
+    - "echo \"# $PR_TITLE\" > pr_description.md"
+    - "echo \"\" >> pr_description.md"
+    - "echo \"#### Summary of Changes:\" >> pr_description.md"
+    - "git diff --name-status HEAD~1 >> pr_description.md"
+    - "echo \"\" >> pr_description.md"
+    - "echo \"#### Commit Logs:\" >> pr_description.md"
+    - "git log -3 --pretty=format:'- %h %s' >> pr_description.md"
   artifacts:
     paths:
       - pr_description.md
