@@ -21,11 +21,12 @@ setup:
     - "pip --version"
     - "python -m venv venv"
     - "source venv/bin/activate"
-    # Unset proxy variables so that PySocks installs without interference
+    # Unset proxy variables for a clean pip upgrade/install
     - "unset HTTP_PROXY && unset HTTPS_PROXY"
-    - "pip install pysocks"
-    - "pip install ruff flake8"
-    # Now set the proxy variables again
+    - "pip install --upgrade pip setuptools wheel"
+    # Install PySocks and other packages before re-enabling the proxy
+    - "pip install pysocks ruff flake8"
+    # Now re-set the proxy variables
     - "export HTTP_PROXY='socks5://proxy.scss.tcd.ie:1080'"
     - "export HTTPS_PROXY='socks5://proxy.scss.tcd.ie:1080'"
   cache:
@@ -48,8 +49,8 @@ analyse:
     - "echo 'Running custom Python script'"
     - "pip install -r backend/requirements.txt"
     - "curl -I https://www.google.com || echo 'No internet access'"
-    - "nslookup pgtest-syedbelalhyder-d2f6.i.aivencloud.com || echo 'DNS resolution failed'"
-    - "nc -zv pgtest-syedbelalhyder-d2f6.i.aivencloud.com 24584 || echo 'Database connection failed'"
+    - "nslookup pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com || echo 'DNS resolution failed'"
+    - "nc -zv pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com 26260 || echo 'Database connection failed'"
     - "python backend/app/scripts/analyze_codebase_script.py --dirPath backend/codebase > report.md 2>&1 || true"
   artifacts:
     paths:
