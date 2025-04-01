@@ -1,6 +1,8 @@
 import argparse
 import json
 import os
+import socket
+import socks
 from datetime import datetime
 from sqlalchemy import create_engine, Table, MetaData, insert
 from sqlalchemy.orm import sessionmaker
@@ -17,6 +19,26 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 metadata = MetaData()
 response_data = Table("response_data", metadata, autoload_with=engine)
 
+# SOCKS proxy configuration
+SOCKS_PROXY_HOST = "socks-proxy.scss.tcd.ie"
+SOCKS_PROXY_PORT = 1080
+
+def is_college_environment():
+    """
+    Check if a direct connection to the database is possible.
+    Returns False if a direct connection is successful, True otherwise.
+    """
+    DB_HOST = "pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com"
+    DB_PORT = 26260
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(2)
+        result = s.connect_ex((DB_HOST, DB_PORT))
+        s.close()
+        return False if result == 0 else True
+    except Exception:
+        return True
+
 def analyze_code(code):
     """Analyze Python code for AST issues, PEP8 violations, and code smells."""
     ast_parser = astParser()
@@ -32,6 +54,14 @@ def analyze_code(code):
 
 def save_to_db(filename, code, analysis_result):
     """Save analysis results to the database and return the inserted ID."""
+    original_socket = socket.socket
+    if is_college_environment():
+        print("Using SOCKS proxy for database connection.")
+        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, SOCKS_PROXY_HOST, SOCKS_PROXY_PORT)
+        socket.socket = socks.socksocket
+    else:
+        print("Connecting to database directly.")
+
     db = SessionLocal()
     try:
         stmt = insert(response_data).values(
@@ -52,6 +82,8 @@ def save_to_db(filename, code, analysis_result):
         return None
     finally:
         db.close()
+        if is_college_environment():
+            socket.socket = original_socket
 
 def format_analysis_results(filename, results, inserted_id):
     """Format and print the analysis results with the inserted database ID."""
