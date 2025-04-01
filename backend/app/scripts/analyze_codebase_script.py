@@ -12,16 +12,15 @@ from backend.app.services.ast_parsing_service import astParser
 from backend.app.services.code_smells_service import check_code_smell
 from backend.app.services.liniting_service import run_pep8_linter
 
-# Database connection setup
+# Database connection details
 DATABASE_URL = "postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-metadata = MetaData()
-response_data = Table("response_data", metadata, autoload_with=engine)
 
 # SOCKS proxy configuration
 SOCKS_PROXY_HOST = "socks-proxy.scss.tcd.ie"
 SOCKS_PROXY_PORT = 1080
+
+original_socket = socket.socket  # Save the original socket
+
 
 def is_college_environment():
     """
@@ -39,6 +38,30 @@ def is_college_environment():
     except Exception:
         return True
 
+
+def get_db_components():
+    """
+    Create and return a new SQLAlchemy engine, session, metadata, and response_data table.
+    This function applies the SOCKS proxy (if needed) before creating the engine.
+    """
+    if is_college_environment():
+        print("Using SOCKS proxy for database connection.")
+        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, SOCKS_PROXY_HOST, SOCKS_PROXY_PORT)
+        socket.socket = socks.socksocket
+    else:
+        print("Connecting to database directly.")
+
+    engine = create_engine(DATABASE_URL)
+    SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+    metadata = MetaData()
+    response_data = Table("response_data", metadata, autoload_with=engine)
+
+    # Restore original socket after engine creation
+    if is_college_environment():
+        socket.socket = original_socket
+    return engine, SessionLocal, metadata, response_data
+
+
 def analyze_code(code):
     """Analyze Python code for AST issues, PEP8 violations, and code smells."""
     ast_parser = astParser()
@@ -52,16 +75,10 @@ def analyze_code(code):
         "Code Smells": code_smells
     }
 
+
 def save_to_db(filename, code, analysis_result):
     """Save analysis results to the database and return the inserted ID."""
-    original_socket = socket.socket
-    if is_college_environment():
-        print("Using SOCKS proxy for database connection.")
-        socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, SOCKS_PROXY_HOST, SOCKS_PROXY_PORT)
-        socket.socket = socks.socksocket
-    else:
-        print("Connecting to database directly.")
-
+    engine, SessionLocal, metadata, response_data = get_db_components()
     db = SessionLocal()
     try:
         stmt = insert(response_data).values(
@@ -82,19 +99,20 @@ def save_to_db(filename, code, analysis_result):
         return None
     finally:
         db.close()
-        if is_college_environment():
-            socket.socket = original_socket
+
 
 def format_analysis_results(filename, results, inserted_id):
     """Format and print the analysis results with the inserted database ID."""
     print(f"\n# Code Analysis Report for {filename}\n")
     print(f"## Status: Successfully Added to Database with ID: {inserted_id}\n")
     print("## AST Issues")
-    print("\n".join(f"- {issue}" for issue in results["AST Issues"]) if results["AST Issues"] else "- No AST issues found.")
+    print("\n".join(f"- {issue}" for issue in results["AST Issues"]) if results[
+        "AST Issues"] else "- No AST issues found.")
     print("\n## PEP8 Compliance")
     print(results["PEP8 Issues"].strip() if results["PEP8 Issues"] else "All checks passed!\n")
     print("\n## Code Smells")
     print(results["Code Smells"].strip() if results["Code Smells"] else "No code smells detected.\n")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to analyze all Python files in a given directory.")
