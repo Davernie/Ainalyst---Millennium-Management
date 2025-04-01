@@ -1,6 +1,11 @@
+import os
+
+# Set proxy environment variables early so that litellm (httpx) picks them up
+os.environ["HTTP_PROXY"] = "socks5://proxy.scss.tcd.ie:1080"
+os.environ["HTTPS_PROXY"] = "socks5://proxy.scss.tcd.ie:1080"
+
 import argparse
 import json
-import os
 import socket
 import socks
 from datetime import datetime
@@ -13,13 +18,14 @@ from backend.app.services.code_smells_service import check_code_smell
 from backend.app.services.liniting_service import run_pep8_linter
 
 # Database connection details
-DATABASE_URL = "postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require"
+DATABASE_URL = ("postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@"
+                "pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require")
 
 # SOCKS proxy configuration
 SOCKS_PROXY_HOST = "socks-proxy.scss.tcd.ie"
 SOCKS_PROXY_PORT = 1080
 
-original_socket = socket.socket  # Save the original socket
+original_socket = socket.socket  # Save original socket
 
 
 def is_college_environment():
@@ -42,7 +48,7 @@ def is_college_environment():
 def get_db_components():
     """
     Create and return a new SQLAlchemy engine, session, metadata, and response_data table.
-    This function applies the SOCKS proxy (if needed) before creating the engine.
+    Ensures that the SOCKS proxy is applied before engine creation.
     """
     if is_college_environment():
         print("Using SOCKS proxy for database connection.")
@@ -56,7 +62,7 @@ def get_db_components():
     metadata = MetaData()
     response_data = Table("response_data", metadata, autoload_with=engine)
 
-    # Restore original socket after engine creation
+    # Restore original socket to avoid affecting further operations
     if is_college_environment():
         socket.socket = original_socket
     return engine, SessionLocal, metadata, response_data
@@ -68,7 +74,6 @@ def analyze_code(code):
     ast_issues = ast_parser.analyze(code)
     pep8_issues = run_pep8_linter(code)
     code_smells = check_code_smell(code)
-
     return {
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues,
@@ -88,7 +93,6 @@ def save_to_db(filename, code, analysis_result):
             code=json.dumps(code),
             report_response=json.dumps(analysis_result)
         ).returning(response_data.c.id)
-
         result = db.execute(stmt)
         db.commit()
         inserted_id = result.fetchone()[0]
@@ -120,7 +124,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     directory_path = Path(args.dirPath).resolve()
-
     if not directory_path.exists() or not directory_path.is_dir():
         print("Error: Provided path is not a valid directory.")
         exit(1)
