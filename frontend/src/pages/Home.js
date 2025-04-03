@@ -61,6 +61,7 @@ function Home() {
   return (
     <div className="page-container">
       <h2>Analyze Python Code</h2>
+      <form onSubmit={analyzeCode}>
       <input
         type="text"
         placeholder="Username"
@@ -74,9 +75,11 @@ function Home() {
         onChange={(e) => setFilePath(e.target.value)}
       />
       <input type="file" accept=".py" onChange={handleFileUpload} />
-      <button onClick={analyzeCode} disabled={loading || !fileContent}>
+      <button type="submit" disabled={loading || !fileContent}>
         {loading ? "Analyzing..." : "Submit"}
       </button>
+    </form>
+
 
       {/* Display API Response */}
       {error && <p style={{ color: "red" }}>ERROR: {error}</p>}
