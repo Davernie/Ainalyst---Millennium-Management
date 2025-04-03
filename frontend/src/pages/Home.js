@@ -62,23 +62,34 @@ function Home() {
     <div className="page-container">
       <h2>Analyze Python Code</h2>
       <form onSubmit={analyzeCode}>
+    <input
+      type="text"
+      placeholder="Username"
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+    />
+    <input
+      type="text"
+      placeholder="File name"
+      value={filePath}
+      onChange={(e) => setFilePath(e.target.value)}
+    />
+    <div className="file-upload-wrapper">
+    <label htmlFor="file-upload" className="file-upload-label">
+      {fileContent ? "File Selected" : "Choose Python File"}
+    </label>
       <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        id="file-upload"
+        type="file"
+        accept=".py"
+        onChange={handleFileUpload}
+        className="file-upload-input"
       />
-      <input
-        type="text"
-        placeholder="File name"
-        value={filePath}
-        onChange={(e) => setFilePath(e.target.value)}
-      />
-      <input type="file" accept=".py" onChange={handleFileUpload} />
-      <button type="submit" disabled={loading || !fileContent}>
-        {loading ? "Analyzing..." : "Submit"}
-      </button>
-    </form>
+    </div>
+    <button type="submit" disabled={loading || !fileContent}>
+      {loading ? "Analyzing..." : "Submit"}
+    </button>
+  </form>
 
 
       {/* Display API Response */}
