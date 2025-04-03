@@ -246,3 +246,32 @@ async def get_response_user_filename(data: ProgramInput, db: Session = Depends(g
     print(f"Found {len(formatted_results)} results.")
     print(formatted_results)
     return formatted_results
+
+@router.get("/latest-response", status_code=200)
+async def get_latest_response(db: Session = Depends(get_db)):
+    """Retrieve the most recent analysis response by timestamp."""
+    result = db.execute(
+        select(response_data)
+        .order_by(response_data.c.timestamp.desc())
+        .limit(1)
+    ).first()
+
+    if not result:
+        return {
+            "id": "N/A",
+            "timestamp": "N/A",
+            "code": "N/A",
+            "report_response": "N/A",
+            "pr_title": "N/A"
+        }
+
+    # Parse report_response is stored as JSON
+    report = json.loads(result.report_response)
+
+    return {
+        "id": result.id,
+        "timestamp": result.timestamp,
+        "code": result.code,
+        "report_response": report,
+        "pr_title": report.get("PR Title", "N/A")
+    }
