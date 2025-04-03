@@ -24,7 +24,7 @@ setup:
     # Unset proxy variables to allow a clean installation of PySocks
     - "unset HTTP_PROXY && unset HTTPS_PROXY"
     - "pip install --upgrade pip setuptools wheel"
-    - "pip install pysocks ruff flake8"
+    - "pip install -r backend/requirements.txt"
     # Now set the proxy variables again
     - "export HTTP_PROXY='socks5://proxy.scss.tcd.ie:1080'"
     - "export HTTPS_PROXY='socks5://proxy.scss.tcd.ie:1080'"
@@ -98,4 +98,5 @@ run_api:
   script:
     - "source venv/bin/activate"
     - "echo 'Running FastAPI backend...'"
+    - "python -c 'import fastapi; print(f\"FastAPI version: {fastapi.__version__}\")'"
     - "uvicorn backend.app.main:app --host 0.0.0.0 --port 8080"
