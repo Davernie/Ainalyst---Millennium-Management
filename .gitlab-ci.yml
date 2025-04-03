@@ -25,6 +25,7 @@ setup:
     - "unset HTTP_PROXY && unset HTTPS_PROXY"
     - "pip install --upgrade pip setuptools wheel"
     - "pip install pysocks ruff flake8"
+    -"pip install uvicorn"
     # Now set the proxy variables again
     - "export HTTP_PROXY='socks5://proxy.scss.tcd.ie:1080'"
     - "export HTTPS_PROXY='socks5://proxy.scss.tcd.ie:1080'"
