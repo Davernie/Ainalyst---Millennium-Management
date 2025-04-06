@@ -160,3 +160,22 @@ nav ul li a:hover {
     margin-bottom: 10px;
   }
 }
+
+.jira-user {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 20px;
+  transition: color 0.3s ease;
+}
+
+.jira-user:hover {
+  color: #d4d4d4;
+}
+
+.nav-container ul {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
