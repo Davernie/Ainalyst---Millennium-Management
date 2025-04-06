@@ -1,4 +1,3 @@
-# api/v1/parse.py
 import json
 import os
 from datetime import datetime
@@ -10,7 +9,7 @@ from pathlib import Path
 
 from backend.app.services.ast_parsing_service import astParser
 from backend.app.services.liniting_service import run_pep8_linter
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, desc
 from sqlalchemy.orm import Session
 
 from backend.app.database.database import get_db
@@ -26,13 +25,14 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-
 class CodeInput(BaseModel):
     code: str
     userName: str  # Username of the user submitting the code
     fileName: str  # Name of the submitted file
+
+
 @router.post("/analyze")
-async def analyze_code(data: CodeInput,  db: Session = Depends(get_db)):
+async def analyze_code(data: CodeInput, db: Session = Depends(get_db)):
     """Analyze Python code for AST issues and PEP8 violations."""
     code = data.code
     userName = data.userName
@@ -110,7 +110,6 @@ async def get_all_responses(db: Session = Depends(get_db)):
                 "report_response": "N/A"
             }
         ]
-
 
 
 @router.post("/analyze-codebase")
@@ -205,9 +204,12 @@ async def get_response_by_id(response_id: int, db: Session = Depends(get_db)):
         "report_response": json.loads(result.report_response)
     }
 
+
 class ProgramInput(BaseModel):
     userName: str  # Username of the user submitting the code
-    fileName: str # Name of the submitted file
+    fileName: str  # Name of the submitted file
+
+
 @router.post("/getresponse/", status_code=200)
 async def get_response_user_filename(data: ProgramInput, db: Session = Depends(get_db)):
     """Retrieve all responses by username and filename."""
@@ -246,3 +248,21 @@ async def get_response_user_filename(data: ProgramInput, db: Session = Depends(g
     print(f"Found {len(formatted_results)} results.")
     print(formatted_results)
     return formatted_results
+
+
+@router.get("/analyze-latest", status_code=200)
+async def analyze_latest(db: Session = Depends(get_db)):
+    """Retrieve the latest saved response from the database by selecting the maximum id."""
+    latest = db.execute(
+        select(response_data).order_by(desc(response_data.c.id)).limit(1)
+    ).first()
+
+    if not latest:
+        raise HTTPException(status_code=404, detail="No responses found")
+
+    return {
+        "id": latest.id,
+        "timestamp": latest.timestamp,
+        "code": latest.code,
+        "report_response": json.loads(latest.report_response)
+    }
