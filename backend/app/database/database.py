@@ -18,7 +18,8 @@ DB_PORT = os.getenv("DB_PORT", "5432")  # Default to 5432 if not specified
 DB_NAME = os.getenv("DB_NAME")
 
 # Construct the DATABASE_URL
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+#DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = "postgresql://avnadmin:AVNS_d4bV5orCyjUIYKdkJiQ@pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com:26260/defaultdb?sslmode=require"
 
 # Print connection message
 print(f"Connecting to database: {DATABASE_URL}")
@@ -49,6 +50,8 @@ def init_db():
     with engine.connect() as conn:
         metadata.create_all(engine)  # Creates table if it does not exist
         print("Database initialized successfully. Table 'response_data' is ready.")
+
+
 
 # Move get_db function here
 def get_db():

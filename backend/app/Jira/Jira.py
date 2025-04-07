@@ -18,6 +18,7 @@ def get_jira_description():
     description = issue.fields.description
     print(f"Issue Description: {description}")
     return description
+    
 
 # Just used to test the function
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ function Home() {
   const [apiResponse, setApiResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [mode, setMode] = useState("upload"); // 'upload' or 'path'
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -31,6 +32,7 @@ function Home() {
       const reader = new FileReader();
       reader.onload = (event) => {
         setFileContent(event.target.result);
+        setFilePath(file.name);
       };
       reader.readAsText(file);
     }
@@ -42,8 +44,6 @@ function Home() {
     setError(null);
     setApiResponse(null);
 
-    console.log("Fetching logs for:", username, filePath);
-
     try {
       const response = await fetch("http://localhost:8080/analyze", {
         method: "POST",
@@ -51,7 +51,7 @@ function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          code: fileContent,
+          code: mode === "path" ? null : fileContent,
           userName: username,
           fileName: filePath,
         }),
@@ -62,8 +62,6 @@ function Home() {
       }
 
       const data = await response.json();
-      console.log("API Response:", data);
-
       setApiResponse(data);
     } catch (err) {
       setError(err.message);
@@ -75,40 +73,68 @@ function Home() {
   return (
     <div className="page-container">
       <h2>Analyze Python Code</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="File name or absolute path"
-        value={filePath}
-        onChange={(e) => setFilePath(e.target.value)}
-      />
-      
-      <div
-        className="file-upload-container"
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-      >
-        <p className="file-upload-text">Drag and drop a Python file here</p>
+      <form onSubmit={analyzeCode}>
         <input
-          type="file"
-          accept=".py"
-          onChange={handleFileUpload}
-          className="file-upload-input"
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
-        <p className="file-upload-text">Or click to select a file</p>
-      </div>
 
-      <button onClick={analyzeCode} disabled={loading || (!fileContent && !filePath)}>
-        {loading ? "Analyzing..." : "Submit"}
-      </button>
+        {/* Mode toggle */}
+        <div style={{ display: "flex", gap: "15px" }}>
+          <label>
+            <input
+              type="radio"
+              value="upload"
+              checked={mode === "upload"}
+              onChange={() => setMode("upload")}
+            />
+            Upload File
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="path"
+              checked={mode === "path"}
+              onChange={() => setMode("path")}
+            />
+            Use File Path
+          </label>
+        </div>
 
-      {/* Display API Response */}
+        {mode === "path" ? (
+          <input
+            type="text"
+            placeholder="Enter absolute file path"
+            value={filePath}
+            onChange={(e) => setFilePath(e.target.value)}
+          />
+        ) : (
+          <div
+            className="file-upload-container"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            <p className="file-upload-text">
+              {fileContent ? "File Selected" : "Drag & Drop Python File or Click to Choose"}
+            </p>
+            <input
+              type="file"
+              accept=".py"
+              onChange={handleFileUpload}
+              className="file-upload-input"
+            />
+          </div>
+        )}
+
+        <button type="submit" disabled={loading || (mode === "upload" && !fileContent)}>
+          {loading ? "Analyzing..." : "Submit"}
+        </button>
+      </form>
+
       {error && <p style={{ color: "red" }}>ERROR: {error}</p>}
+
       {apiResponse && (
         <div>
           <h3>Analysis Results:</h3>
@@ -118,6 +144,8 @@ function Home() {
           <pre>{JSON.stringify(apiResponse["AST Issues"], null, 2)}</pre>
           <p><strong>PEP8 Issues:</strong></p>
           <pre>{JSON.stringify(apiResponse["PEP8 Issues"], null, 2)}</pre>
+          <p><strong>Code Smells:</strong></p>
+          <pre>{JSON.stringify(apiResponse["Code Smells"], null, 2)}</pre>
         </div>
       )}
     </div>
