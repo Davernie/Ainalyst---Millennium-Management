@@ -97,7 +97,7 @@ nav {
 }
 
 .small-logo {
-  width: 70px; 
+  width: 70px;
   height: auto;
   margin-left: 10px;
 
@@ -106,7 +106,8 @@ nav {
 .big-logo {
   width: 130px;
   height: auto;
-  margin-left: -10px; 
+  margin-left: 10px;
+  margin-right: -100px;
   padding-top: 10px;
 }
 
@@ -129,11 +130,32 @@ nav ul li a {
   font-size: 18px;
   font-weight: bold;
   transition: color 0.3s ease;
-  padding: 20px;
+  padding: 10px;
+  align-items: center;
 }
 
 nav ul li a:hover {
   color: #d4d4d4;
+}
+
+
+.jira-user {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  align-items: right;
+  transition: color 0.3s ease;
+}
+
+.jira-user:hover {
+  color: #d4d4d4;
+}
+
+.nav-container ul {
+  display: flex;
+  justify-content: center;
+  flex: 1;
 }
 
 @media (max-width: 768px) {
@@ -159,23 +181,4 @@ nav ul li a:hover {
   .nav-logo {
     margin-bottom: 10px;
   }
-}
-
-.jira-user {
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-right: 20px;
-  transition: color 0.3s ease;
-}
-
-.jira-user:hover {
-  color: #d4d4d4;
-}
-
-.nav-container ul {
-  display: flex;
-  justify-content: center;
-  flex: 1;
 }

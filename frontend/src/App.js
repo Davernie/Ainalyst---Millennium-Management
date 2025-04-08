@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import History from "./pages/History";
 import JiraLogin from "./pages/JiraLogin";
 import MostCommonIssues from './pages/MostCommonIssues';
-import logo from "./logo.svg";
+import logo from "./millennium.svg";
 import logo2 from "./AI-nalyst.svg";
 import "./App.css";
 import { useContext } from "react";
@@ -17,8 +17,12 @@ function NavBar() {
     <nav>
       <div className="nav-container">
         <div className="logo-group">
-          <img src={logo} alt="Logo" className="nav-logo small-logo" />
-          <img src={logo2} alt="AI-nalyst Logo" className="nav-logo big-logo" />
+          <Link to="/">
+            <img src={logo} alt="Logo" className="nav-logo small-logo" />
+          </Link>
+          <Link to="/">
+            <img src={logo2} alt="AI-nalyst Logo" className="nav-logo big-logo" />
+          </Link>
         </div>
 
         <ul>
@@ -28,7 +32,7 @@ function NavBar() {
         </ul>
 
         {jiraEmail && (
-          <div className="jira-email" onClick={() => navigate("/")}>
+          <div className="jira-user" onClick={() => navigate("/")}>
             {jiraEmail}
           </div>
         )}
@@ -36,6 +40,7 @@ function NavBar() {
     </nav>
   );
 }
+
 
 function App() {
   return (

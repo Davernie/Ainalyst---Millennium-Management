@@ -92,29 +92,15 @@ function MostCommonIssues() {
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
       <h2>Common Issues Analysis</h2>
-      <form onSubmit={fetchCommonIssues} style={{ marginBottom: 20 }}>
-        <input
-          type="text"
-          placeholder="Enter username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: 8, marginRight: 10, width: 200 }}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: 4,
-            cursor: 'pointer'
-          }}
-        >
-          {loading ? 'Analyzing...' : 'Analyze Issues'}
-        </button>
-      </form>
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+        <button onClick={fetchCommonIssues} disabled={loading }>
+        {loading ? "Analyzing..." : "Get Most Common Issues"}
+      </button>
 
       {error && (
         <div style={{ color: 'red', margin: '10px 0' }}>

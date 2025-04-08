@@ -20,6 +20,24 @@ function Home() {
     }
   };
 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFileContent(event.target.result);
+        setFilePath(file.name);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+
   const analyzeCode = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -105,6 +123,22 @@ function Home() {
               whiteSpace: "pre-wrap",
             }}
           >
+          <div
+            className="file-drop-container"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            <p className="file-drop-text">
+              {fileContent ? "File Selected" : "Drag & Drop Python File or Click to Choose"}
+            </p>
+            <input
+              type="file"
+              accept=".py"
+              onChange={handleFileUpload}
+              className="file-drop-input"
+            />
+          </div>
+
             <p><strong>Status:</strong> {apiResponse.Status}</p>
             <p><strong>Request ID:</strong> {apiResponse.id}</p>
             <strong>AST Issues:</strong>
