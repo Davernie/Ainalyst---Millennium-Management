@@ -1,18 +1,50 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { JiraContext } from "../JiraContext";
 
 function JiraLogin() {
-  const { setJiraUser, setJiraToken } = useContext(JiraContext);
-  const [username, setUsername] = useState("");
-  const [token, setToken] = useState("");
+  const [jiraServer, setJiraServer] = useState("");
+  const [jiraEmail, setJiraEmail] = useState("");
+  const [jiraApiToken, setJiraApiToken] = useState("");
+  const [issueKey, setIssueKey] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setJiraUser(username);
-    setJiraToken(token);
-    navigate("/home"); // go to Home after submitting
+
+    try {
+      // Prepare the credentials payload
+      const credentials = {
+        jiraServer,
+        jiraEmail,
+        jiraApiToken,
+        issueKey,
+      };
+
+      // Make the API call to the backend
+      const response = await fetch("http://localhost:8080/update-env", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update environment variables");
+      }
+
+      const data = await response.json();
+
+      if (data.message) {
+        navigate("/home"); // Go to Home after submitting
+      } else {
+        setError("Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError(error.message || "An unexpected error occurred.");
+    }
   };
 
   return (
@@ -21,20 +53,32 @@ function JiraLogin() {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Jira Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
+          placeholder="Jira Server URL"
+          value={jiraServer}
+          onChange={(e) => setJiraServer(e.target.value)}
         />
         <input
-          type="password"
-          placeholder="Jira Token"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-          required
+          type="email"
+          placeholder="Jira Email"
+          value={jiraEmail}
+          onChange={(e) => setJiraEmail(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Jira API Token"
+          value={jiraApiToken}
+          onChange={(e) => setJiraApiToken(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Jira Branch Name"
+          value={issueKey}
+          onChange={(e) => setIssueKey(e.target.value)}
         />
         <button type="submit">Submit</button>
       </form>
+
+      {error && <p style={{ color: "red" }}>{error}</p>} {/* Display error message if any */}
     </div>
   );
 }

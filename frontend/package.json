@@ -9,8 +9,10 @@
     "@testing-library/user-event": "^13.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.1.5",
     "react-scripts": "^5.0.1",
+    "recharts": "^2.15.2",
     "tailwindcss": "^4.0.6",
     "web-vitals": "^2.1.4"
   },
