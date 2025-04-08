@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 function History() {
   const [replies, setReplies] = useState([]);
@@ -127,7 +128,7 @@ function History() {
                 )}
                 <br />
                 <strong>PEP8 Issues:</strong> {pep8Issues}<br />
-                <strong>Code Smells:</strong> {reply.report_response["Code Smells"]}
+                <strong>Code Smells:</strong> <ReactMarkdown>{reply.report_response["Code Smells"]}</ReactMarkdown>
               </div>
             );
           })}

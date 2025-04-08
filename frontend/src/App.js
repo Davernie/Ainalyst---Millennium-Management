@@ -3,13 +3,14 @@ import { JiraProvider, JiraContext } from "./JiraContext";
 import Home from "./pages/Home";
 import History from "./pages/History";
 import JiraLogin from "./pages/JiraLogin";
+import MostCommonIssues from './pages/MostCommonIssues';
 import logo from "./logo.svg";
 import logo2 from "./AI-nalyst.svg";
 import "./App.css";
 import { useContext } from "react";
 
 function NavBar() {
-  const { jiraUser } = useContext(JiraContext);
+  const { jiraEmail } = useContext(JiraContext);
   const navigate = useNavigate();
 
   return (
@@ -23,11 +24,12 @@ function NavBar() {
         <ul>
           <li><Link to="/home">Home</Link></li>
           <li><Link to="/history">History</Link></li>
+          <li><Link to="/mostcommon">Most Common Issues</Link></li>
         </ul>
 
-        {jiraUser && (
-          <div className="jira-user" onClick={() => navigate("/")}>
-            {jiraUser}
+        {jiraEmail && (
+          <div className="jira-email" onClick={() => navigate("/")}>
+            {jiraEmail}
           </div>
         )}
       </div>
@@ -45,6 +47,7 @@ function App() {
             <Route path="/" element={<JiraLogin />} />
             <Route path="/home" element={<Home />} />
             <Route path="/history" element={<History />} />
+            <Route path="/mostcommon" element={<MostCommonIssues />} />
           </Routes>
         </div>
       </Router>

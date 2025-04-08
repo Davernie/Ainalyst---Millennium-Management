@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 function Home() {
   const [username, setUsername] = useState("");
@@ -123,7 +124,7 @@ function Home() {
               <div>{apiResponse["PEP8 Issues"]}</div>
             )}
             <br />
-            <strong>Code Smells:</strong> {apiResponse["Code Smells"]}
+            <strong>Code Smells:</strong> <ReactMarkdown>{apiResponse["Code Smells"]}</ReactMarkdown>
           </div>
         </div>
       )}
