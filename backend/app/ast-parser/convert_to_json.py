@@ -17,6 +17,6 @@ def convert_code_to_json_string(file_path):
 
 
 # Example usage:
-file_path = 'fileForTesting.py'  # Replace with the actual file path
+file_path = '../../../fileForTesting.py'  # Replace with the actual file path
 json_payload = convert_code_to_json_string(file_path)
 print(json_payload)
