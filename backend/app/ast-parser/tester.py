@@ -7,7 +7,7 @@ output_filename = "output.txt"
 sys.stdout = open(output_filename, "w")
 
 # Analyze the test file
-analyze_code_from_file("fileForTesting.py")
+analyze_code_from_file("../../fileForTesting.py")
 
 # Reset stdout
 sys.stdout.close()
