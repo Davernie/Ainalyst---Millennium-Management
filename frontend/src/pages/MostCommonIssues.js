@@ -27,7 +27,6 @@ function MostCommonIssues() {
       if (!response.ok) {
         const errorText = "Error with status " + response.status.toString();
         setError(errorText);
-        return;
       }
 
       const data = await response.json();
@@ -40,13 +39,26 @@ function MostCommonIssues() {
     }
   };
 
+  const renderCustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{ background: 'white', border: '1px solid #ccc', padding: 10 }}>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>{payload[0].name}</p>
+          <p style={{ margin: 0 }}>Value: {payload[0].value}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const renderPieChart = (issues, title) => {
     if (!issues || !Array.isArray(issues) || issues.length === 0) {
       return <p>No {title.toLowerCase()} found</p>;
     }
 
     const chartData = issues.slice(0, 5).map(([name, value], index) => ({
-      name: name.length > 20 ? `${name.substring(0, 20)}...` : name,
+      name: name, // Full name for tooltip
+      displayName: name.length > 20 ? `${name.substring(0, 20)}...` : name, // Short label
       value: value,
       color: COLORS[index % COLORS.length]
     }));
@@ -63,13 +75,13 @@ function MostCommonIssues() {
               cx="50%"
               cy="50%"
               outerRadius={120}
-              label={({ name }) => name}
+              label={({ index }) => chartData[index].displayName}
             >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip content={renderCustomTooltip} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
@@ -118,6 +130,6 @@ function MostCommonIssues() {
       </div>
     </div>
   );
-};
+}
 
 export default MostCommonIssues;
