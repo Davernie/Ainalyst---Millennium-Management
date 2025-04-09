@@ -56,7 +56,7 @@ async def analyze_code(data: CodeInput, db: Session = Depends(get_db)):
                 report_response=json.dumps({
                     "AST Issues": ast_issues if ast_issues else "No AST issues found.",
                     "PEP8 Issues": pep8_issues,
-                    "Code Smells": code_smells,
+                    "Code Smells": code_smells
                 })
             ).returning(response_data.c.id)
         )
@@ -81,6 +81,7 @@ async def analyze_code(data: CodeInput, db: Session = Depends(get_db)):
         "id": inserted_id,  # Add the id explicitly here
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues,
+        "Code Smells": code_smells
         "Code Smells": code_smells
     }
     format_analysis_results(response, inserted_id)
@@ -265,4 +266,54 @@ async def analyze_latest(db: Session = Depends(get_db)):
         "timestamp": latest.timestamp,
         "code": latest.code,
         "report_response": json.loads(latest.report_response)
+    }
+
+
+from collections import Counter
+
+
+@router.get("/common_issues/{user_name}", status_code=200)
+async def get_common_issues(user_name: str, db: Session = Depends(get_db)):
+    """Get the most common AST and PEP8 issues for a specific user.
+
+    Args:
+        user_name: Username to analyze (from URL path)
+        db: Database session dependency
+    """
+    # Fetch all rows matching the username
+    result = db.execute(
+        select(response_data).where(response_data.c.username == user_name)
+    ).fetchall()
+
+    if not result:
+        return {"message": "No submissions found for this user."}
+
+    ast_issues_counter = Counter()
+    pep8_issues_counter = Counter()
+
+    for row in result:
+        try:
+            report = json.loads(row.report_response)
+            ast_issues = report.get("AST Issues", "")
+            pep8_issues = report.get("PEP8 Issues", "")
+
+            # Normalize to a list
+            if isinstance(ast_issues, str):
+                ast_issues = ast_issues.split("\n")
+            if isinstance(pep8_issues, str):
+                pep8_issues = pep8_issues.split("\n")
+
+            ast_issues = [issue.strip() for issue in ast_issues if issue.strip()]
+            pep8_issues = [issue.strip() for issue in pep8_issues if issue.strip()]
+
+            ast_issues_counter.update(ast_issues)
+            pep8_issues_counter.update(pep8_issues)
+
+        except Exception as e:
+            print(f"Error processing report_response for row {row.id}: {e}")
+
+    return {
+        "user": user_name,
+        "common_AST_Issues": ast_issues_counter.most_common(),
+        "common_PEP8_Issues": pep8_issues_counter.most_common()
     }
