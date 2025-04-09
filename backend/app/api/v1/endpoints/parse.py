@@ -82,7 +82,6 @@ async def analyze_code(data: CodeInput, db: Session = Depends(get_db)):
         "AST Issues": ast_issues if ast_issues else "No AST issues found.",
         "PEP8 Issues": pep8_issues,
         "Code Smells": code_smells
-        "Code Smells": code_smells
     }
     format_analysis_results(response, inserted_id)
     return response
