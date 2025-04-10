@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import History from "./pages/History";
 import JiraLogin from "./pages/JiraLogin";
 import MostCommonIssues from './pages/MostCommonIssues';
+import AllSubmissions from './pages/AllSubmissions';
+
 import logo from "./millennium.svg";
 import logo2 from "./AI-nalyst.svg";
 import "./App.css";
@@ -29,6 +31,7 @@ function NavBar() {
           <li><Link to="/home">Home</Link></li>
           <li><Link to="/history">History</Link></li>
           <li><Link to="/mostcommon">Most Common Issues</Link></li>
+          <li><Link to="/allsubs">All Submissions</Link></li>
         </ul>
 
         {jiraEmail && (
@@ -53,6 +56,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/history" element={<History />} />
             <Route path="/mostcommon" element={<MostCommonIssues />} />
+            <Route path="/allsubs" element={<AllSubmissions />} />
           </Routes>
         </div>
       </Router>

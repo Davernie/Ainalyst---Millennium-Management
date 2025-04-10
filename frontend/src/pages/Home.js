@@ -103,18 +103,21 @@ function Home() {
       value={filePath}
       onChange={(e) => setFilePath(e.target.value)}
     />
-    <div className="file-upload-wrapper">
-    <label htmlFor="file-upload" className="file-upload-label">
-      {fileContent ? "File Selected" : "Choose Python File"}
-    </label>
-      <input
-        id="file-upload"
-        type="file"
-        accept=".py"
-        onChange={handleFileUpload}
-        className="file-upload-input"
-      />
-    </div>
+    <div
+            className="file-drop-container"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            <p className="file-drop-text">
+              {fileContent ? "File Selected" : "Drag & Drop Python File or Click to Choose"}
+            </p>
+            <input
+              type="file"
+              accept=".py"
+              onChange={handleFileUpload}
+              className="file-drop-input"
+            />
+          </div>
     <button type="submit" disabled={loading || !fileContent}>
       {loading ? "Analyzing..." : "Submit"}
     </button>
@@ -137,21 +140,7 @@ function Home() {
               whiteSpace: "pre-wrap",
             }}
           >
-          <div
-            className="file-drop-container"
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          >
-            <p className="file-drop-text">
-              {fileContent ? "File Selected" : "Drag & Drop Python File or Click to Choose"}
-            </p>
-            <input
-              type="file"
-              accept=".py"
-              onChange={handleFileUpload}
-              className="file-drop-input"
-            />
-          </div>
+
 
             <p><strong>Status:</strong> {apiResponse.Status}</p>
             <p><strong>Request ID:</strong> {apiResponse.id}</p>
@@ -164,6 +153,7 @@ function Home() {
               <div>{apiResponse["AST Issues"]}</div>
             )}
             <br />
+            <strong>PEP8 Issues:</strong>
             {Array.isArray(apiResponse["PEP8 Issues"]) ? (
               apiResponse["PEP8 Issues"].map((issue, idx) => (
                 <div key={idx}>{issue}</div>
