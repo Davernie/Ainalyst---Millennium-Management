@@ -1,35 +1,34 @@
 image: python:3.12
 
-variables:
-  HTTP_PROXY: "socks5://proxy.scss.tcd.ie:1080"
-  HTTPS_PROXY: "socks5://proxy.scss.tcd.ie:1080"
-
 stages:
-  - cleanup
   - setting_up
   - analyse_code
-  - generate_pr
-  - run_api
+  - commit_fixes
+
+variables:
+  GIT_HTTP_PROXY: ""
+  GIT_HTTPS_PROXY: ""
+  NO_PROXY: "gitlab.com,*.gitlab.net"
+  JIRA_URL: "https://tcd-team-ayl4vbq6.atlassian.net"
+  JIRA_EMAIL: "eortiz@tcd.ie"
+  BRANCH_NAME: "AUT-2"
+  GITLAB_API_URL: "https://gitlab.com"
+  # Ensure these tokens are set in your CI/CD variables.
+  OPENAI_API_KEY: "$OPENAI_API_KEY"
+  GITLAB_API_TOKEN: "$GITLAB_API_TOKEN"
+  # Disable shallow cloning so the complete commit history is available.
+  GIT_DEPTH: "0"
 
 setup:
   stage: setting_up
-  tags:
-    - docker
   script:
-    - "apt-get update && apt-get install -y build-essential libffi-dev python3-dev libssl-dev"
-    - "python --version"
-    - "pip --version"
-    - "python -m venv venv"
-    - "source venv/bin/activate"
-    # Unset proxy variables to allow a clean installation of PySocks
-    - "unset HTTP_PROXY && unset HTTPS_PROXY"
-    - "pip install --upgrade pip setuptools wheel"
-    - "pip install pysocks ruff flake8"
-    # Now set the proxy variables again
-    - "export HTTP_PROXY='socks5://proxy.scss.tcd.ie:1080'"
-    - "export HTTPS_PROXY='socks5://proxy.scss.tcd.ie:1080'"
+    - python --version
+    - pip --version
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip ruff flake8 requests python-dotenv litellm tiktoken
   cache:
-    key: requirements
+    key: "$CI_COMMIT_REF_SLUG"
     paths:
       - venv/
   artifacts:
@@ -39,63 +38,39 @@ setup:
 
 analyse:
   stage: analyse_code
-  tags:
-    - docker
   script:
-    - "apt-get update && apt-get install -y netcat-openbsd dnsutils"
-    - "source venv/bin/activate"
-    - "export PYTHONPATH=$(pwd)"
-    - "echo 'Running custom Python script'"
-    - "pip install -r backend/requirements.txt"
-    - "curl -I https://www.google.com || echo 'No internet access'"
-    - "nslookup pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com || echo 'DNS resolution failed'"
-    # Replace netcat test with Python one-liner that uses PySocks:
-    - "python -c \"import socks, socket; socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5, 'proxy.scss.tcd.ie', 1080); socket.socket = socks.socksocket; s = socket.socket(); s.settimeout(10); s.connect(('pg-298e7c66-senthilnaveen003-3105.k.aivencloud.com', 26260)); print('Connected successfully'); s.close()\" || echo 'Database connection failed'"
-    - "python backend/app/scripts/analyze_codebase_script.py --dirPath backend/codebase > report.md 2>&1 || true"
+    - apt-get update && apt-get install -y netcat-openbsd dnsutils
+    - source venv/bin/activate
+    # Ensure the full history is available (this is extra safety; GIT_DEPTH: 0 usually does it).
+    - git fetch --unshallow || true
+    - export PYTHONPATH=$(pwd)
+    - echo "Running analysis on changed Python files..."
+    - pip install -r backend/requirements.txt
+    # Use CI_PROJECT_URL so the script auto-detects the repository URL.
+    - python backend/app/scripts/analyze_codebase_script.py --repoURL "$CI_PROJECT_URL" --jiraTicket "$BRANCH_NAME"
+    - cat overall_report_id.txt  # Debug: show the overall report ID
+  artifacts:
+    paths:
+      - report.md
+      - overall_report_id.txt
+    expire_in: 1 week
+
+commit_fixes:
+  stage: commit_fixes
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /^fixes-/'
+      when: never
+    - when: on_success
+  script:
+    - apt-get update && apt-get install -y git
+    - source venv/bin/activate
+    - pip install -r backend/requirements.txt
+    # Configure Git author identity for the commit.
+    - git config --global user.email "ci@example.com"
+    - git config --global user.name "GitLab CI"
+    - export LATEST_OVERALL_REPORT_ID=$(cat overall_report_id.txt)
+    - python backend/app/scripts/analyze_codebase_script.py --fix
   artifacts:
     paths:
       - report.md
     expire_in: 1 week
-
-generate_pr:
-  stage: generate_pr
-  tags:
-    - docker
-  script:
-    - "source venv/bin/activate"
-    - "echo 'Generating PR Title and Description'"
-    - "CHANGED_FILE=$(git diff --name-only HEAD~1 | head -n 1)"
-    - "FIRST_COMMIT=$(git log -1 --pretty=format:'%s')"
-    - "CHANGES_STATUS=$(git diff --name-status HEAD~1)"
-    - |
-      if echo "$CHANGES_STATUS" | grep -q "^M"; then
-          TYPE="Fix"
-      elif echo "$CHANGES_STATUS" | grep -q "^A"; then
-          TYPE="Feature"
-      elif echo "$CHANGES_STATUS" | grep -q "^D"; then
-          TYPE="Cleanup"
-      else
-          TYPE="Update"
-      fi
-    - "PR_TITLE=\"$TYPE: Changes in \\\"$CHANGED_FILE\\\" - \\\"$FIRST_COMMIT\\\"\""
-    - "echo 'Generating PR Description...'"
-    - "echo \"# $PR_TITLE\" > pr_description.md"
-    - "echo \"\" >> pr_description.md"
-    - "echo \"#### Summary of Changes:\" >> pr_description.md"
-    - "git diff --name-status HEAD~1 >> pr_description.md"
-    - "echo \"\" >> pr_description.md"
-    - "echo \"#### Commit Logs:\" >> pr_description.md"
-    - "git log -3 --pretty=format:'- %h %s' >> pr_description.md"
-  artifacts:
-    paths:
-      - pr_description.md
-    expire_in: 1 week
-
-run_api:
-  stage: run_api
-  tags:
-    - docker
-  script:
-    - "source venv/bin/activate"
-    - "echo 'Running FastAPI backend...'"
-    - "uvicorn main:app --host 0.0.0.0 --port 8080"
